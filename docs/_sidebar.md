@@ -11,6 +11,7 @@
   * [在gvrooy中获取shell执行的值](/devops/在gvrooy中获取shell执行的值.md)
   * [Gitlab 备份与还原](/devops/gitlab-backup-rollbak.md)
 * Kubernetes学习
+    * [Kubernetes学习记录](/k8s/README.md)
     * [使用kubeadm快速部署一个K8s集群](k8s/fast-install-k8s.md)
     * [使用kubeadm搭建高可用的K8s集群](k8s/使用kubeadm搭建高可用的K8s集群)
     * [Kubernetes高可用集群二进制部署（Runtime Containerd）](k8s/Kubernetes高可用集群二进制部署Runtime-Containerd)
