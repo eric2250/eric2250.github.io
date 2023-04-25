@@ -12,6 +12,7 @@
   * [gitlab备份与还原](/devops/gitlab-backup-rollbak.md)
   * [gitLab从SVN迁移库](/devops/gitLab从SVN迁移库.md)
   * [jenkins安装](/devops/jebkins安装.md)
+  * [jenkins针对不同的项目组对用户进行权限分配](/devops/jenkins针对不同的项目组对用户进行权限分配.md)
   * [jenkins在k8s动态agent配置](/devops/jenkins在k8s动态agent配置.md)
   * [jenkns配置163邮箱](/devops/jenkns配置163邮箱.md)
   * [jebkins在gvrooy中获取shell执行的值](/devops/jebkins在gvrooy中获取shell执行的值.md)
