@@ -6,6 +6,7 @@
 
 * DevOps学习
   * [git编译安装](devops/git安装.md)
+  * [gitea安装](devops/gitea安装.md)  
   * [k8s中jenkins动态agent配置](/devops/k8s中jenkins动态agent配置.md)
   * [jenkns配置163邮箱](/devops/jenkns配置163邮箱.md)
   * [在gvrooy中获取shell执行的值](/devops/在gvrooy中获取shell执行的值.md)
