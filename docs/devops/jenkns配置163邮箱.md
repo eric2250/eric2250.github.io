@@ -2,9 +2,13 @@
 
 - 登录邮箱-设置-POP3/SMTP/IMAP-POP3/SMTP服务已开启-获取授权码-MJQELDMMRGJZAHKH
 
+![jenkins163](..\images\jenkins163.png)
+
 
 ## 2.jebkins配置-系统配置-最下面邮件通知 ##
 -前提先设置 系统管理员邮件地址：gouwqiang@163.com
+
+![jenkins163-1](..\images\jenkins163-1.png)
 
 - SMTP服务器：smtp.163.com
 - 用户默认邮件后缀：选填
@@ -12,7 +16,7 @@
 	- 用户名：gouwqiang@163.com
 	- 密码：MJQELDMMRGJZAHKH 授权码
                AVUYJNHJCEBSPCZP
-			
+	
 - SMTP端口：465 （勾选使用SSL协议）
 - SMTP端口：25  （不勾选使用SSL协议）
 - 字符集：UTF-8
@@ -25,8 +29,8 @@
 
 ## 3.配置流水线发送 ##
 	mail to: 'gouwqiang@163.com',
-    subject: "Successful Pipeline: ${currentBuild.fullDisplayName}",
-    body: "Something is wrong with ${env.BUILD_URL}"
+	subject: "Successful Pipeline: ${currentBuild.fullDisplayName}",
+	body: "Something is wrong with ${env.BUILD_URL}"
 
 ```
     emailext to: 'gouwqiang@163.com',
@@ -60,4 +64,4 @@
                 </table> 
             </body> 
             </html>  """  
-```              
+```
