@@ -1,8 +1,8 @@
 <!-- _sidebar.md -->
 
-* 首页
+* [首页](/)
   * [开始使用 Let Go](/README.md) <!--注意这里是相对路径-->
-    * [菜单](/)
+    * [菜单](/README.md)
 
 * DevOps学习
   * [git编译安装](devops/git安装.md)
@@ -16,6 +16,7 @@
   * [jenkins在k8s动态agent配置](/devops/jenkins在k8s动态agent配置.md)
   * [jenkns配置163邮箱](/devops/jenkns配置163邮箱.md)
   * [jebkins在gvrooy中获取shell执行的值](/devops/jebkins在gvrooy中获取shell执行的值.md)
+  * [jenkins集成sonarqube](/devops/jenkins集成sonarqube.md)
   * [ldap服务部署](/devops/ldap服务部署.md)
   * [ldap用户管理](/devops/ldap用户管理.md)
   * [ldap集成jenkins](/devops/ldap集成jenkins.md)
