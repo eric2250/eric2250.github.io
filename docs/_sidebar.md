@@ -40,6 +40,7 @@
 * Linux系统学习
   * [搭建dns服务器](/Linux/搭建dns服务器.md)
   * [搭建nginx服务器](/Linux/nginx安装.md)
+  * [Mysql安装](/Linux/Mysql安装.md)
   * [修改网卡名称](/Linux/修改网卡名称.md)
   * [Centos7升级内核](/Linux/Centos7升级内核.md)
   * [Centos7nfs搭建](/Linux/centos-nfs搭建.md)
