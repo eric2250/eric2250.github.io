@@ -5,6 +5,8 @@
     * [菜单](/README.md)
 
 * DevOps学习
+  * [confluence服务部署](/devops/confluence服务部署.md)
+  * [mindoc安装](/devops/MinDoc安装.md)
   * [git编译安装](devops/git安装.md)
   * [gitea安装](devops/gitea安装.md)
   * [gitlab安装](devops/gitLab安装极狐.md)
@@ -23,6 +25,7 @@
   * [ldap集成gitlab](/devops/gitLab集成ldap.md)
   * [ldap集成sonarqube](/devops/ldap集成sonarqube.md)
   * [ldap集成mindoc](/devops/ldap集成mindoc.md)
+  * [Calibre文档转换工具安装](/devops/Calibre文档转换工具安装.md)
 * Kubernetes学习
   * [Kubernetes学习记录](/k8s/README.md)
   * [使用kubeadm快速部署一个K8s集群](k8s/fast-install-k8s.md)
@@ -38,9 +41,10 @@
   * [kubeadm安装的k8s集群卸载方式](/k8s/kubeadm安装的k8s集群卸载方式.md)
   * [harbor搭建](/k8s/harbor搭建.md)
 * Linux系统学习
-  * [搭建dns服务器](/Linux/搭建dns服务器.md)
-  * [搭建nginx服务器](/Linux/nginx安装.md)
+  * [dns服务搭建](/Linux/搭建dns服务器.md)
+  * [nginx服务搭建](/Linux/nginx安装.md)
   * [Mysql安装](/Linux/Mysql安装.md)
+  * [Ewomail邮件服务安装](/Linux/Ewomail邮件服务安装.md)
   * [修改网卡名称](/Linux/修改网卡名称.md)
   * [Centos7升级内核](/Linux/Centos7升级内核.md)
   * [Centos7nfs搭建](/Linux/centos-nfs搭建.md)
