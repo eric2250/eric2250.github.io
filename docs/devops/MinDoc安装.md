@@ -239,6 +239,19 @@ ldap_filter=objectClass=posixAccount
 # 5. 导出配置
 
 ```
+###############配置导出项目###################
+enable_export="${MINDOC_ENABLE_EXPORT||false}"
+#同一个项目同时运行导出程序的并行数量，取值1-4之间，取值越大导出速度越快，越占用资源
+export_process_num="${MINDOC_EXPORT_PROCESS_NUM||1}"
+
+#并发导出的项目限制，指同一时间限制的导出项目数量，如果为0则不限制。设置的越大，越占用资源
+export_limit_num="${MINDOC_EXPORT_LIMIT_NUM||5}"
+
+#指同时等待导出的任务数量
+export_queue_limit_num="${MINDOC_EXPORT_QUEUE_LIMIT_NUM||100}"
+
+#导出项目的缓存目录配置
+export_output_path="${MINDOC_EXPORT_OUTPUT_PATH||./runtime/cache}"
 
 ```
 
