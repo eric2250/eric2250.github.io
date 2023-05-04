@@ -5,8 +5,10 @@
     * [菜单](/README.md)
 
 * DevOps学习
+  * [ZenTao禅道安装](/devops/ZenTao禅道安装.md)
   * [confluence服务部署](/devops/confluence服务部署.md)
   * [mindoc安装](/devops/MinDoc安装.md)
+  * [Svn搭建](/devops/Svn搭建.md)
   * [git编译安装](devops/git安装.md)
   * [gitea安装](devops/gitea安装.md)
   * [gitlab安装](devops/gitLab安装极狐.md)
@@ -25,6 +27,7 @@
   * [ldap集成gitlab](/devops/gitLab集成ldap.md)
   * [ldap集成sonarqube](/devops/ldap集成sonarqube.md)
   * [ldap集成mindoc](/devops/ldap集成mindoc.md)
+  * [NodeJs环境搭建](/devops/Tools/NodeJs环境搭建.md)
   * [Calibre文档转换工具安装](/devops/Calibre文档转换工具安装.md)
 * Kubernetes学习
   * [docker与docker-compose安装](/k8s/docker与docker-compose安装.md)

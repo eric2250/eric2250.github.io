@@ -1,4 +1,4 @@
-# 使用 Docker Compose 安装极狐GitLab
+# 1. 使用 Docker Compose 安装极狐GitLab
 
 https://docs.gitlab.cn/jh/install/docker.html
 
@@ -141,7 +141,7 @@ GitLab 设置为中文版
 
 ![img](..\images\gitlab.png)
 
-# 使用 Docker Engine 安装极狐GitLab
+# 2. 使用 Docker Engine 安装极狐GitLab
 
 您可以微调这些目录以满足您的要求。 一旦设置了 `GITLAB_HOME` 变量，您就可以运行镜像：
 
@@ -158,7 +158,7 @@ sudo docker run --detach \
   registry.gitlab.cn/omnibus/gitlab-jh:latest
 ```
 
-# CentOS 7安装极狐GitLab
+# 3. CentOS 7安装极狐GitLab
 
 1. 安装和配置必须的依赖项
 
@@ -213,7 +213,7 @@ cat /etc/gitlab/initial_root_password
 
 - 完成安装后，请参考建议的[后续配置](https://docs.gitlab.cn/jh/install/next_steps.html)，包括身份验证选项和注册限制的配置。
 
-# Kubernetes安装极狐GitLab
+# 4. Kubernetes安装极狐GitLab
 
 ```Bash
 helm repo add gitlab-jh https://charts.gitlab.cn
@@ -233,3 +233,70 @@ helm upgrade --install gitlab gitlab-jh/gitlab \
  helm uninstall gitlab gitlab-jh/gitlab
 ```
 
+# 5. 解决gitlab prometheus data占满磁盘的问题
+
+Gitlab 默认是开启 Prometheus监控的，data数据默认存储15天。
+
+磁盘紧张的情况下，我们主要有两种办法解决该问题：
+
+## 方法一：修改数据保留时长
+
+下面的配置内容默认全部是注释掉的，可以去掉前面的 `#` ，然后将15d修改为对应所需的数值即可。
+
+```Assembly
+# prometheus['flags'] = {
+#   'storage.tsdb.path' => "/var/opt/gitlab/prometheus/data",
+#   'storage.tsdb.retention.time' => "15d",
+#   'config.file' => "/var/opt/gitlab/prometheus/prometheus.yml"
+# }
+```
+
+修改为(注意：需要删除注释`#`)
+
+```Assembly
+prometheus['flags'] = {
+  'storage.tsdb.path' => "/var/opt/gitlab/prometheus/data",
+  'storage.tsdb.retention.time' => "1d",
+  'config.file' => "/var/opt/gitlab/prometheus/prometheus.yml"
+}
+```
+
+## 方法二：直接关闭 Prometheus
+
+```
+vim gitlab/config/gitlab.rb
+```
+
+将
+
+```Shell
+# prometheus['enable'] = true
+```
+
+修改为(注意：需要删除注释`#`)
+
+```Plain
+prometheus['enable'] = false
+```
+
+## 重启gitlab
+
+最后重启 gitlab 即可，多余的文件会被自动删除。
+
+停止
+
+```Plain
+gitlab-ctl stop
+```
+
+重新配置
+
+```Plain
+gitlab-ctl reconfigure
+```
+
+启动
+
+```Plain
+gitlab-ctl start
+```
