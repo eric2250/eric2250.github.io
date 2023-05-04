@@ -54,3 +54,5 @@
   * [Centos7nfs搭建](/Linux/centos-nfs搭建.md)
   * [Centos8修改网卡信息及yum配置nfs搭建](/Linux/centos8-修改网卡信息及yum配置nfs搭建.md)
   * [Ubuntu22.04安装后配置](/Linux/Ubuntu22.04安装后配置.md)
+  * [Jdk下载安装与环境变量配置](/Linux/Jdk下载安装与环境变量配置.md)
+  * [Centos&Ubuntu防火墙设置](/Linux/Centos&Ubuntu防火墙设置.md)
