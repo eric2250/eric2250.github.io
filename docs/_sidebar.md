@@ -12,6 +12,7 @@
   * [git编译安装](devops/git安装.md)
   * [gitea安装](devops/gitea安装.md)
   * [gitlab安装](devops/gitLab安装极狐.md)
+  * [gitlab使用Helm部署](devops/使用Helm部署gitlab.md)
   * [gitlab集成ldap](/devops/gitLab集成ldap.md)
   * [gitlab备份与还原](/devops/gitlab-backup-rollbak.md)
   * [gitLab从SVN迁移库](/devops/gitLab从SVN迁移库.md)
