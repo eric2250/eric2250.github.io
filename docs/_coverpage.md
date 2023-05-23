@@ -1,7 +1,7 @@
 <!-- _coverpage.md -->
 
 ![logo](/ericdoc-logo.png)
-# East-port Docs使用指南 
+# Eic Docs使用指南 
 
 > 💪 Eric Docs使用指南，使用Eric Docs打造最强、最轻量级的个人&团队文档。
 
