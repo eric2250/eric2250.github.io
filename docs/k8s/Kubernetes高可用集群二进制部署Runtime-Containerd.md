@@ -684,6 +684,7 @@ cfssl gencert -initca ca-csr.json | cfssljson -bare ca
 ~~~powershell
 生成默认文件
 cfssl print-defaults config > ca-config.json
+修改www为kubernetes
 ~~~
 
 ~~~powershell
