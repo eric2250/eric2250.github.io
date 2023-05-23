@@ -344,21 +344,21 @@ EOF
 
 ### 2.1.1 Containerd部署文件获取
 
-![image-20230404104037517](k8s 1.27集群部署 容器运行时为containerd.assets/image-20230404104037517.png)
+![image-20230404104037517](../images/k8s/image-20230404104037517.png)
 
 
 
-![image-20230404104105753](k8s 1.27集群部署 容器运行时为containerd.assets/image-20230404104105753.png)
+![image-20230404104105753](../images/k8s/image-20230404104105753.png)
 
 
 
-![image-20230404104133243](k8s 1.27集群部署 容器运行时为containerd.assets/image-20230404104133243.png)
+![image-20230404104133243](../images/k8s/image-20230404104133243.png)
 
 
 
 
 
-![image-20230404110339317](k8s 1.27集群部署 容器运行时为containerd.assets/image-20230404110339317.png)
+![image-20230404110339317](../images/k8s/image-20230404110339317.png)
 
 
 
@@ -417,15 +417,15 @@ sandbox_image = "registry.k8s.io/pause:3.9" 由3.8修改为3.9
 
 ## 2.2 runc准备
 
-![image-20230404110955173](k8s 1.27集群部署 容器运行时为containerd.assets/image-20230404110955173.png)
+![image-20230404110955173](../images/k8s/image-20230404110955173.png)
 
 
 
-![image-20230404111012599](k8s 1.27集群部署 容器运行时为containerd.assets/image-20230404111012599.png)
+![image-20230404111012599](../images/k8s/image-20230404111012599.png)
 
 
 
-![image-20230404111058832](k8s 1.27集群部署 容器运行时为containerd.assets/image-20230404111058832.png)
+![image-20230404111058832](../images/k8s/image-20230404111058832.png)
 
 
 
@@ -433,7 +433,7 @@ sandbox_image = "registry.k8s.io/pause:3.9" 由3.8修改为3.9
 
 
 
-![image-20230404111223856](k8s 1.27集群部署 容器运行时为containerd.assets/image-20230404111223856.png)
+![image-20230404111223856](../images/k8s/image-20230404111223856.png)
 
 
 
@@ -481,7 +481,7 @@ sandbox_image = "registry.k8s.io/pause:3.9" 由3.8修改为3.9
 
 ### 2.2.2 runc安装
 
-![image-20230404111621805](k8s 1.27集群部署 容器运行时为containerd.assets/image-20230404111621805.png)
+![image-20230404111621805](../images/k8s/image-20230404111621805.png)
 
 
 
@@ -723,11 +723,11 @@ k8s-worker02   Ready    <none>          13m   v1.27.0
 
 
 
-![image-20230404115348450](k8s 1.27集群部署 容器运行时为containerd.assets/image-20230404115348450.png)
+![image-20230404115348450](../images/k8s/image-20230404115348450.png)
 
 
 
-![image-20230404115500987](k8s 1.27集群部署 容器运行时为containerd.assets/image-20230404115500987.png)
+![image-20230404115500987](../images/k8s/image-20230404115500987.png)
 
 
 
