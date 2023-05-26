@@ -608,10 +608,19 @@ KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"
 
 
 ~~~powershell
-[root@k8s-master01 ~]# kubeadm init --kubernetes-version=v1.27.0 --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=192.168.10.160  --cri-socket unix:///var/run/containerd/containerd.sock
+[root@k8s-master01 ~]# kubeadm init --kubernetes-version=v1.27.0 \
+--pod-network-cidr=10.244.0.0/16 \
+--apiserver-advertise-address=192.168.10.160  \
+--cri-socket unix:///var/run/containerd/containerd.sock
 ~~~
 
-
+~~~powershell
+kubeadm init --kubernetes-version=v1.27.0 \
+--pod-network-cidr=10.244.0.0/16 \
+--apiserver-advertise-address=172.100.3.116  \
+--image-repository registry.aliyuncs.com/google_containers \
+--cri-socket unix:///var/run/containerd/containerd.sock
+~~~
 
 ~~~powershell
 [init] Using Kubernetes version: v1.27.0
