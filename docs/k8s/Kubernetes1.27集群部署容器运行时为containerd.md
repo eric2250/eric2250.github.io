@@ -459,7 +459,11 @@ sandbox_image = "registry.k8s.io/pause:3.9" 由3.8修改为3.9
 # yum install gperf -y
 ~~~
 
-
+~~~powershell
+# 最小化按安装开发工具
+# yum group list
+# yum groupinstall "Development Tools"
+~~~
 
 ~~~powershell
 # ./configure
