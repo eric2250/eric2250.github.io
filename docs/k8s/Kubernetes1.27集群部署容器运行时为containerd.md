@@ -605,12 +605,28 @@ KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"
 
 ## 3.3 K8S集群初始化
 
+### 导入镜像
 
-
+链接：https://pan.baidu.com/s/13Ugocu0T7z0PUMK4tpwQZQ?pwd=gzrr 
+提取码：gzrr
+crictl images 查不到镜像原因：ctr是containerd自带的工具，有命名空间的概念，若是k8s相关的镜像，都默认在k8s.io这个命名空间，所以导入镜像时需要指定命令空间为k8s.io
 ~~~powershell
-[root@k8s-master01 ~]# kubeadm init --kubernetes-version=v1.27.0 \
+#导入
+ctr -n k8s.io images import coredns-v1.10.1.tar.gz 
+ctr -n k8s.io images import kube-apiserver-v1.27.2.tar.gz 
+ctr -n k8s.io images import kube-proxy-1.27.2.tar.gz 
+ctr -n k8s.io images import kube-controller-manager-1.27.2.tar.gz 
+ctr -n k8s.io images import kube-scheduler-1.27.2.tar.gz 
+ctr -n k8s.io images import etcd-3.5.7.tar.gz 
+ctr -n k8s.io images import pause-3.9.tar.gz 
+ctr images list
+#查看
+crictl img
+~~~
+~~~powershell
+kubeadm init --kubernetes-version=v1.27.2 \
 --pod-network-cidr=10.244.0.0/16 \
---apiserver-advertise-address=192.168.10.160  \
+--apiserver-advertise-address=172.100.3.116  \
 --cri-socket unix:///var/run/containerd/containerd.sock
 ~~~
 
