@@ -1741,6 +1741,20 @@ ExecStart=/usr/bin/cri-dockerd --pod-infra-container-image=registry.k8s.io/pause
 systemctl restart cri-docker &&systemctl status cri-docker&&systemctl enable cri-docker
 ```
 
+导入镜像
+
+```
+docker load -i coredns-v1.10.1.tar.gz
+docker load -i etcd-3.5.7.tar.gz
+docker load -i kube-apiserver-v1.27.2.tar.gz
+docker load -i kube-controller-manager-1.27.2.tar.gz
+docker load -i kube-proxy-1.27.2.tar.gz
+docker load -i kube-scheduler-1.27.2.tar.gz
+docker load -i pause-3.9.tar.gz
+```
+
+
+
 #### 2.5.9.2 部署kubelet
 
 > 在k8s-master1上操作
@@ -1995,6 +2009,8 @@ EOF
 chmod +x kube-proxy.service
 ```
 
+1.27
+
 ```
 cat > /usr/lib/systemd/system/kube-proxy.service << "EOF"
 [Unit]
@@ -2044,7 +2060,7 @@ systemctl enable --now kube-proxy
 systemctl status kube-proxy
 ```
 
-# 三、K8S集群部署
+# 三、K8S集群部署（kubeadm）
 
 ## 3. 安装Docker
 
