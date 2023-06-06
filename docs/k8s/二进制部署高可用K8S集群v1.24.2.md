@@ -335,7 +335,13 @@ cfssl版本：1.6.1
 (1) cfssl/cfssl-json/cfssl-certinfo下载地址：
 
 https://github.com/cloudflare/cfssl/releases
-1
+
+```
+mv cfssl_linux-amd64 /usr/local/bin/cfssl
+mv cfssljson_linux-amd64 /usr/local/bin/cfssljson
+mv cfssl-certinfo_linux-amd64 /usr/local/bin/cfssl-certinfo
+```
+
 cfssl: 用于签发证书，输出json格式文本；
 cfssl-json: 将cfssl签发生成的证书(json格式)变成文件承载式文件；
 cfssl-certinfo: 验证查看证书信息。
@@ -377,7 +383,7 @@ EOF
 (2) 创建CA根证书策略文件
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/etcd/cert/ca-config.json << EOF
+cat > /data/etcd/cert/ca-config.json << EOF
 {
     "signing": {
         "default": {
@@ -427,13 +433,13 @@ EOF
 (3) 创建etcd证书，客户端访问与节点互相访问使用同一套证书
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/etcd/cert/etcd-csr.json << EOF
+cat > /data/etcd/cert/etcd-csr.json << EOF
 {
     "CN": "k8s-etcd",
     "hosts": [
-        "10.0.0.1",
-        "10.0.0.2",
-        "10.0.0.3",
+        "172.100.3.116",
+        "172.100.3.117",
+        "172.100.3.118",
         "127.0.0.1"
     ],
     "key": {
@@ -456,16 +462,16 @@ EOF
 (4) 生成etcd证书和私钥
 
 ```
-[root@YonXin-SIT-Master01 ~]# cd /data/etcd/cert/ && cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
-[root@YonXin-SIT-Master01 ~]# cfssl gencert -ca="ca.pem" -ca-key="ca-key.pem" -config="ca-config.json" -profile="kubernetes" etcd-csr.json | cfssljson -bare etcd
+#cd /data/etcd/cert/ && cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
+#cfssl gencert -ca="ca.pem" -ca-key="ca-key.pem" -config="ca-config.json" -profile="kubernetes" etcd-csr.json | cfssljson -bare etcd
 
 ```
 
 (5) 查询证书有效期
 
 ```
-[root@YonXin-SIT-Master01 ~]# openssl x509 -noout -text -in /data/etcd/cert/ca.pem | grep Not  //查询ca证书有效期
-[root@YonXin-SIT-Master01 ~]# openssl x509 -noout -text -in /data/etcd/cert/etcd.pem | grep Not  //查询etcd证书有效期
+#openssl x509 -noout -text -in /data/etcd/cert/ca.pem | grep Not  //查询ca证书有效期
+#openssl x509 -noout -text -in /data/etcd/cert/etcd.pem | grep Not  //查询etcd证书有效期
 ```
 
 ### 2.2 安装etcd集群
@@ -479,25 +485,25 @@ https://github.com/etcd-io/etcd/releases/tag/v3.5.4
 (2) 二进制安装第一台etcd
 
 ```
-[root@YonXin-SIT-Master01 ~]# tar -zxf etcd-v3.5.4-linux-amd64.tar.gz -C /data/
-[root@YonXin-SIT-Master01 ~]# mv /data/etcd-v3.5.4-linux-amd64 /data/etcd 
-[root@YonXin-SIT-Master01 ~]# mkdir -p /data/etcd/{cert,config,data,logs,service}
-[root@YonXin-SIT-Master01 ~]# cp /data/etcd/etcdctl  /usr/bin/
-[root@YonXin-SIT-Master01 ~]# vim /data/etcd/config/etcd.conf
+#tar -zxf etcd-v3.5.4-linux-amd64.tar.gz -C /data/
+#mv /data/etcd-v3.5.4-linux-amd64 /data/etcd 
+#mkdir -p /data/etcd/{cert,config,data,logs,service}
+#cp /data/etcd/etcdctl  /usr/bin/
+#vim /data/etcd/config/etcd.conf
 #[Member]
 ETCD_NAME="etcd01"
 ETCD_DATA_DIR="/data/etcd/data"
-ETCD_LISTEN_PEER_URLS="https://10.0.0.1:2380"
-ETCD_LISTEN_CLIENT_URLS="https://10.0.0.1:2379,http://127.0.0.1:2379"
+ETCD_LISTEN_PEER_URLS="https://172.100.3.116:2380"
+ETCD_LISTEN_CLIENT_URLS="https://172.100.3.116:2379,http://127.0.0.1:2379"
 ETCD_QUOTA_BACKEND_BYTES="8000000000"
 #[Clustering]
 #ETCD_INITIAL_CLUSTER_STATE="new"
-ETCD_INITIAL_ADVERTISE_PEER_URLS="https://10.0.0.1:2380"
-ETCD_ADVERTISE_CLIENT_URLS="https://10.0.0.1:2379"
-ETCD_INITIAL_CLUSTER="etcd01=https://10.0.0.1:2380,etcd02=https://10.0.0.2:2380,etcd03=https://10.0.0.3:2380"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://172.100.3.116:2380"
+ETCD_ADVERTISE_CLIENT_URLS="https://172.100.3.116:2379"
+ETCD_INITIAL_CLUSTER="etcd01=https://172.100.3.116:2380,etcd02=https://172.100.3.117:2380,etcd03=https://172.100.3.118:2380"
 ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
 ETCD_LOG_OUTPUT="stdout"
-[root@YonXin-SIT-Master01 ~]# vim /data/etcd/service/etcd.service
+#vim /data/etcd/service/etcd.service
 [Unit]
 Description=Etcd Server
 After=network.target
@@ -525,37 +531,112 @@ LimitNOFILE=65536
 
 [Install]
 WantedBy=multi-user.target
-[root@YonXin-SIT-Master01 ~]# cp /data/etcd/service/etcd.service  /usr/lib/systemd/system/
-[root@YonXin-SIT-Master01 ~]# systemctl daemon-reload && systemctl enable etcd && systemctl restart etcd
-[root@YonXin-SIT-Master01 ~]# echo "#ETCDCTL Env" >> /etc/profile && echo "export ETCDCTL_API=3" >> /etc/profile
+
+#chmod +x /data/etcd/service/etcd.service
+#cp /data/etcd/service/etcd.service  /usr/lib/systemd/system/
+#systemctl daemon-reload && systemctl enable etcd && systemctl restart etcd
+#echo "#ETCDCTL Env" >> /etc/profile && echo "export ETCDCTL_API=3" >> /etc/profile
 ```
 
 (3) 二进制安装其他etcd
 **复制第一台etcd的目录/data/etcd 到其他2台服务器的/data 目录下，修改/data/etcd/config/etcd.conf配置文件的IP地址和etcd名称，删除/data/etcd/data/目录下的文件，然后执行：**
 
 ```
-[root@YonXin-SIT-Master02 ~]# cp /data/etcd/service/etcd.service  /usr/lib/systemd/system/
-[root@YonXin-SIT-Master02 ~]# systemctl daemon-reload && systemctl enable etcd && systemctl restart etcd
-[root@YonXin-SIT-Master02 ~]# echo "#ETCDCTL Env" >> /etc/profile && echo "export ETCDCTL_API=3" >> /etc/profile
+scp -r /data/etcd k8s-master2:/data/
+scp -r /data/etcd k8s-master3:/data
+```
+
+- Master02：
+
+```
+# cp /data/etcd/service/etcd.service  /usr/lib/systemd/system/
+# systemctl daemon-reload && systemctl enable etcd && systemctl restart etcd
+# echo "#ETCDCTL Env" >> /etc/profile && echo "export ETCDCTL_API=3" >> /etc/profile
+```
+
+```
+#[Member]
+ETCD_NAME="etcd02"
+ETCD_DATA_DIR="/data/etcd/data"
+ETCD_LISTEN_PEER_URLS="https://172.100.3.117:2380"
+ETCD_LISTEN_CLIENT_URLS="https://172.100.3.117:2379,http://127.0.0.1:2379"
+ETCD_QUOTA_BACKEND_BYTES="8000000000"
+#[Clustering]
+#ETCD_INITIAL_CLUSTER_STATE="new"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://172.100.3.117:2380"
+ETCD_ADVERTISE_CLIENT_URLS="https://172.100.3.117:2379"
+ETCD_INITIAL_CLUSTER="etcd01=https://172.100.3.116:2380,etcd02=https://172.100.3.117:2380,etcd03=https://172.100.3.118:2380"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+ETCD_LOG_OUTPUT="stdout"
+```
+
+- Master03：
+
+```
+# cp /data/etcd/service/etcd.service  /usr/lib/systemd/system/
+# systemctl daemon-reload && systemctl enable etcd && systemctl restart etcd
+# echo "#ETCDCTL Env" >> /etc/profile && echo "export ETCDCTL_API=3" >> /etc/profile
+```
+
+```
+#[Member]
+ETCD_NAME="etcd03"
+ETCD_DATA_DIR="/data/etcd/data"
+ETCD_LISTEN_PEER_URLS="https://172.100.3.118:2380"
+ETCD_LISTEN_CLIENT_URLS="https://172.100.3.118:2379,http://127.0.0.1:2379"
+ETCD_QUOTA_BACKEND_BYTES="8000000000"
+#[Clustering]
+#ETCD_INITIAL_CLUSTER_STATE="new"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://172.100.3.118:2380"
+ETCD_ADVERTISE_CLIENT_URLS="https://172.100.3.118:2379"
+ETCD_INITIAL_CLUSTER="etcd01=https://172.100.3.116:2380,etcd02=https://172.100.3.117:2380,etcd03=https://172.100.3.118:2380"
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
+ETCD_LOG_OUTPUT="stdout"
+
 ```
 
 (4) 检查etcd集群状态
 
 ```
-[root@YonXin-SIT-Master01 ~]# etcdctl --endpoints="https://10.0.0.1:2379,https://10.0.0.2:2379,https://10.0.0.3:2379" --cacert=/data/etcd/cert/ca.pem --cert=/data/etcd/cert/etcd.pem --key=/data/etcd/cert/etcd-key.pem --write-out=table member list   #查看集群成员   
+#etcdctl --endpoints="https://172.100.3.116:2379,https://172.100.3.117:2379,https://172.100.3.118:2379" --cacert=/data/etcd/cert/ca.pem --cert=/data/etcd/cert/etcd.pem --key=/data/etcd/cert/etcd-key.pem --write-out=table member list   #查看集群成员   
 ```
 
 ```
-[root@YonXin-SIT-Master01 ~]# etcdctl --endpoints="https://10.0.0.1:2379,https://10.0.0.2:2379,https://10.0.0.3:2379" --cacert=/data/etcd/cert/ca.pem --cert=/data/etcd/cert/etcd.pem --key=/data/etcd/cert/etcd-key.pem --write-out=table endpoint status  #查看集群状态                                                                                                                         
++------------------+---------+--------+----------------------------+----------------------------+------------+
+|        ID        | STATUS  |  NAME  |         PEER ADDRS         |        CLIENT ADDRS        | IS LEARNER |
++------------------+---------+--------+----------------------------+----------------------------+------------+
+| 6bfd5bc5ef71014e | started | etcd02 | https://172.100.3.117:2380 | https://172.100.3.117:2379 |      false |
+| 7bed6697d4a82694 | started | etcd01 | https://172.100.3.116:2380 | https://172.100.3.116:2379 |      false |
+| a5468701781a7603 | started | etcd03 | https://172.100.3.118:2380 | https://172.100.3.118:2379 |      false |
++------------------+---------+--------+----------------------------+----------------------------+------------+
+
 ```
+
+
+
+```
+#etcdctl --endpoints="https://172.100.3.116:2379,https://172.100.3.117:2379,https://172.100.3.118:2379" --cacert=/data/etcd/cert/ca.pem --cert=/data/etcd/cert/etcd.pem --key=/data/etcd/cert/etcd-key.pem --write-out=table endpoint status  #查看集群状态                                                                                                                         
+```
+
+```
++----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
+|          ENDPOINT          |        ID        | VERSION | DB SIZE | IS LEADER | IS LEARNER | RAFT TERM | RAFT INDEX | RAFT APPLIED INDEX | ERRORS |
++----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
+| https://172.100.3.116:2379 | 7bed6697d4a82694 |   3.5.9 |   20 kB |     false |      false |         2 |          8 |                  8 |        |
+| https://172.100.3.117:2379 | 6bfd5bc5ef71014e |   3.5.9 |   20 kB |      true |      false |         2 |          8 |                  8 |        |
+| https://172.100.3.118:2379 | a5468701781a7603 |   3.5.9 |   20 kB |     false |      false |         2 |          8 |                  8 |        |
++----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
+```
+
+
 
 ## 3. 安装第一台k8s-master服务
 
 ### 1 配置4层反向代理
 
 ```
-[root@YonXin-SIT-Master01 ~]# yum install -y keepalived  haproxy    //拉取并配置Keepalived和haproxy
-[root@YonXin-SIT-Master01 ~]# vim /etc/keepalived/keepalived.conf
+#yum install -y keepalived  haproxy    //拉取并配置Keepalived和haproxy
+#vim /etc/keepalived/keepalived.conf
 ! Configuration File for keepalived
 global_defs {
    router_id K8S-HAPROXY
@@ -569,7 +650,7 @@ vrrp_script check_haproxy {
 }
 vrrp_instance VI_HAPROXY {
     state BACKUP
-    interface bond0
+    interface eth0
     virtual_router_id 218
     priority 120
     advert_int 2
@@ -578,14 +659,14 @@ vrrp_instance VI_HAPROXY {
         auth_pass 2121
     }
     virtual_ipaddress {
-        10.0.0.8
+        172.100.3.100
     }
     track_script {
         check_haproxy
     }
 }
-[root@YonXin-SIT-Master01 ~]# journalctl -f -u keepalived    //查看实时日志打印
-[root@YonXin-SIT-Master01 ~]# vim /etc/keepalived/check_haproxy.sh
+#journalctl -f -u keepalived    //查看实时日志打印
+#vim /etc/keepalived/check_haproxy.sh
 #!/bin/bash
 flag=`systemctl status haproxy |grep -cE "running"`
 if [ ${flag} -eq 1 ];then
@@ -593,8 +674,8 @@ if [ ${flag} -eq 1 ];then
 else
   exit 1
 fi
-[root@YonXin-SIT-Master01 ~]# chmod 755  /etc/keepalived/check_haproxy.sh     //可执行权限
-[root@YonXin-SIT-Master01 ~]# vim /etc/haproxy/haproxy.cfg
+#chmod 755  /etc/keepalived/check_haproxy.sh     //可执行权限
+#vim /etc/haproxy/haproxy.cfg
 global
   log 127.0.0.1 local2 info
   chroot      /var/lib/haproxy
@@ -629,10 +710,11 @@ backend k8s_apiserver
     mode tcp
     option tcplog
     balance     roundrobin  # 默认的负载均衡的方式,轮询方式
-    server k8s-master01 10.0.0.1:6443 check inter 2000 fall 2 rise 2 weight 1
-    server k8s-master02 10.0.0.2:6443 check inter 2000 fall 2 rise 2 weight 1
-[root@YonXin-SIT-Master01 ~]# systemctl enable haproxy && systemctl restart haproxy && systemctl status haproxy
-[root@YonXin-SIT-Master01 ~]# systemctl enable keepalived && systemctl restart keepalived
+    server k8s-master01 172.100.3.116:6443 check inter 2000 fall 2 rise 2 weight 1
+    server k8s-master02 172.100.3.117:6443 check inter 2000 fall 2 rise 2 weight 1
+    server k8s-master03 172.100.3.118:6443 check inter 2000 fall 2 rise 2 weight 1
+#systemctl enable haproxy && systemctl restart haproxy && systemctl status haproxy
+#systemctl enable keepalived && systemctl restart keepalived && systemctl status  keepalived
 ```
 
 ### 2 签发所有证书
@@ -641,18 +723,19 @@ backend k8s_apiserver
 (1) 下载二进制包并解压
 
 ```
-[root@YonXin-SIT-Master01 ~]# tar -zxf kubernetes-server-linux-amd64.tar.gz -C /data/
-[root@YonXin-SIT-Master01 ~]# mv /data/kubernetes/server/bin  /data/kubernetes/
-[root@YonXin-SIT-Master01 ~]# rm -rf /data/kubernetes/{kubernetes-src.tar.gz,LICENSES,addons,server,bin/{*.tar,*_tag}}
-[root@YonXin-SIT-Master01 ~]# mkdir -p /data/kubernetes/{cfssl,pki,config,data,logs,service,yaml}
-[root@YonXin-SIT-Master01 ~]# cp /data/kubernetes/bin/kubectl /usr/bin/
+#tar -zxf kubernetes-server-linux-amd64.tar.gz -C /data/
+# mkdir -p /data/kubernetes
+#mv /data/kubernetes/server/bin  /data/kubernetes/
+#rm -rf /data/kubernetes/{kubernetes-src.tar.gz,LICENSES,addons,server,bin/{*.tar,*_tag}}
+#mkdir -p /data/kubernetes/{cfssl,pki,config,data,logs,service,yaml}
+#cp /data/kubernetes/bin/kubectl /usr/bin/
 
 ```
 
 (2) 创建生成CA证书签名请求（CSR）的JSON配置文件，文件路径及内容：
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/pki/ca-csr.json << EOF
+cat > /data/kubernetes/pki/ca-csr.json << EOF
 {
     "CA":{"expiry":"876000h"},
     "CN": "kubernetes",
@@ -676,7 +759,7 @@ EOF
 (2) 创建CA根证书策略文件
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/pki/ca-config.json << EOF
+cat > /data/kubernetes/pki/ca-config.json << EOF
 {
     "signing": {
         "default": {
@@ -726,14 +809,14 @@ EOF
 (3) 创建kube-apiserver的json文件
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/pki/kube-apiserver-csr.json << EOF
+cat > /data/kubernetes/pki/kube-apiserver-csr.json << EOF
 {
     "CN": "kubernetes",
     "hosts": [
-      "10.0.0.1",
-      "10.0.0.2",
-      "10.0.0.3",
-      "10.0.0.8",
+      "172.100.3.116",
+      "172.100.3.117",
+      "172.100.3.118",
+      "172.100.3.100",
       "10.96.0.1",
       "127.0.0.1",
       "kubernetes",
@@ -762,7 +845,7 @@ EOF
 (4) 创建kube-controller-manager的json文件
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/pki/kube-controller-manager-csr.json << EOF
+cat > /data/kubernetes/pki/kube-controller-manager-csr.json << EOF
 {
   "CN": "system:kube-controller-manager",
   "hosts": [],
@@ -786,7 +869,7 @@ EOF
 (5) 创建kube-scheduler的json文件
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/pki/kube-scheduler-csr.json << EOF
+cat > /data/kubernetes/pki/kube-scheduler-csr.json << EOF
 {
   "CN": "system:kube-scheduler",
   "hosts": [],
@@ -810,7 +893,7 @@ EOF
 (6) 创建kubectl的json文件
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/pki/kubectl-csr.json <<EOF
+cat > /data/kubernetes/pki/kubectl-csr.json <<EOF
 {
   "CN": "admin",
   "hosts": [],
@@ -834,7 +917,7 @@ EOF
 (7) 创建kube-proxy的json文件
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/pki/kube-proxy-csr.json << EOF
+cat > /data/kubernetes/pki/kube-proxy-csr.json << EOF
 {
   "CN": "system:kube-proxy",
   "hosts": [],
@@ -858,39 +941,39 @@ EOF
 (8) 创建所有证书文件
 
 ```
-[root@YonXin-SIT-Master01 ~]# cd /data/kubernetes/pki && cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
-[root@YonXin-SIT-Master01 ~]# cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-apiserver-csr.json | cfssljson -bare kube-apiserver
-[root@YonXin-SIT-Master01 ~]# cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
-[root@YonXin-SIT-Master01 ~]# cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-scheduler-csr.json | cfssljson -bare kube-scheduler
-[root@YonXin-SIT-Master01 ~]# cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kubectl-csr.json | cfssljson -bare kubectl
-[root@YonXin-SIT-Master01 ~]# cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-proxy-csr.json | cfssljson -bare kube-proxy
+#cd /data/kubernetes/pki && cfssl gencert -initca ca-csr.json | cfssljson -bare ca -
+#cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-apiserver-csr.json | cfssljson -bare kube-apiserver
+#cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-controller-manager-csr.json | cfssljson -bare kube-controller-manager
+#cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-scheduler-csr.json | cfssljson -bare kube-scheduler
+#cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kubectl-csr.json | cfssljson -bare kubectl
+#cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes kube-proxy-csr.json | cfssljson -bare kube-proxy
 ```
 
 (9) 查询证书文件有效期
 
 ```
-[root@YonXin-SIT-Master01 ~]# openssl x509 -noout -text -in /data/kubernetes/pki/ca.pem | grep Not     //查询ca证书有效期
-[root@YonXin-SIT-Master01 ~]# openssl x509 -noout -text -in /data/kubernetes/pki/kube-apiserver.pem | grep Not
+#openssl x509 -noout -text -in /data/kubernetes/pki/ca.pem | grep Not     //查询ca证书有效期
+#openssl x509 -noout -text -in /data/kubernetes/pki/kube-apiserver.pem | grep Not
 ```
 
 ### 3 生成token.csv文件
 
 ```
-[root@YonXin-SIT-Master01 ~]# head -c 16 /dev/urandom | od -An -t x | tr -d ' '
+#head -c 16 /dev/urandom | od -An -t x | tr -d ' '
 e6c807c0033ea7cfcda16abad126751c
-[root@YonXin-SIT-Master01 ~]# echo 'e6c807c0033ea7cfcda16abad126751c,kubelet-bootstrap,10001,"system:node-bootstrapper"' >  /data/kubernetes/config/token.csv
+#echo '9c23dac5775a373487d76445adb696e1,kubelet-bootstrap,10001,"system:node-bootstrapper"' >  /data/kubernetes/config/token.csv
 ```
 
 ### 4 创建kube-apiserver启动配置和脚本
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/config/kube-apiserver.conf << EOF
+cat > /data/kubernetes/config/kube-apiserver.conf << EOF
 KUBE_APISERVER_OPTS="--logtostderr=false \\
 --v=2 \\
---etcd-servers=https://10.0.0.1:2379,https://10.0.0.2:2379,https://10.0.0.3:2379 \\
---bind-address=10.0.0.1 \\
+--etcd-servers=https://172.100.3.116:2379,https://172.100.3.117:2379,https://172.100.3.118:2379 \\
+--bind-address=172.100.3.116 \\
 --secure-port=6443 \\
---advertise-address=10.0.0.1 \\
+--advertise-address=172.100.3.116 \\
 --allow-privileged=true \\
 --service-cluster-ip-range=10.96.0.0/16 \\
 --enable-admission-plugins=NodeRestriction \\
@@ -922,7 +1005,10 @@ KUBE_APISERVER_OPTS="--logtostderr=false \\
 --audit-log-maxsize=100 \\
 --audit-log-path=/data/kubernetes/logs/audit.log"
 EOF
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/service/kube-apiserver.service << EOF
+```
+
+```
+cat > /data/kubernetes/service/kube-apiserver.service << EOF
 [Unit]
 Description=Kubernetes API Server
 Documentation=https://github.com/kubernetes/kubernetes
@@ -935,31 +1021,49 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 EOF
-[root@YonXin-SIT-Master01 ~]# cp /data/kubernetes/service/kube-apiserver.service /usr/lib/systemd/system/
-[root@YonXin-SIT-Master01 ~]# systemctl enable kube-apiserver && systemctl restart kube-apiserver
+```
+
+```
+#chmod +x /data/kubernetes/service/kube-apiserver.service
+#cp /data/kubernetes/service/kube-apiserver.service /usr/lib/systemd/system/
+systemctl daemon-reload
+systemctl enable kube-apiserver 
+systemctl restart kube-apiserver
+systemctl status kube-apiserver
+```
+
+```
+# 测试
+curl --insecure https://172.100.3.116:6443/
+curl --insecure https://172.100.3.117:6443/
+curl --insecure https://172.100.3.118:6443/
+curl --insecure https://172.100.3.100:5443/
 ```
 
 ### 5 创建kube-controller-manager启动配置和脚本
 
 ```
-[root@YonXin-SIT-Master01 ~]# KUBE_CONFIG="/data/kubernetes/config/kube-controller-manager.kubeconfig" 
-KUBE_APISERVER="https://10.0.0.8:5443" 
-kubectl config set-cluster kubernetes \
+#KUBE_CONFIG="/data/kubernetes/config/kube-controller-manager.kubeconfig" 
+#KUBE_APISERVER="https://172.100.3.100:5443" 
+#kubectl config set-cluster kubernetes \
   --certificate-authority=/data/kubernetes/pki/ca.pem \
   --embed-certs=true \
   --server=${KUBE_APISERVER} \
   --kubeconfig=${KUBE_CONFIG}
-kubectl config set-credentials kube-controller-manager \
+#kubectl config set-credentials kube-controller-manager \
   --client-certificate=/data/kubernetes/pki/kube-controller-manager.pem \
   --client-key=/data/kubernetes/pki/kube-controller-manager-key.pem \
   --embed-certs=true \
   --kubeconfig=${KUBE_CONFIG}
-kubectl config set-context default \
+#kubectl config set-context default \
   --cluster=kubernetes \
   --user=kube-controller-manager \
   --kubeconfig=${KUBE_CONFIG}
-kubectl config use-context default --kubeconfig=${KUBE_CONFIG}
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/config/kube-controller-manager.conf << EOF
+#kubectl config use-context default --kubeconfig=${KUBE_CONFIG}
+```
+
+```
+#cat > /data/kubernetes/config/kube-controller-manager.conf << EOF
 KUBE_CONTROLLER_MANAGER_OPTS="--logtostderr=false \\
 --v=2 \\
 --leader-elect=true \\
@@ -974,7 +1078,10 @@ KUBE_CONTROLLER_MANAGER_OPTS="--logtostderr=false \\
 --service-account-private-key-file=/data/kubernetes/pki/ca-key.pem \\
 --cluster-signing-duration=876000h0m0s"
 EOF
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/service/kube-controller-manager.service << EOF
+```
+
+```
+#cat > /data/kubernetes/service/kube-controller-manager.service << EOF
 [Unit]
 Description=Kubernetes Controller Manager
 Documentation=https://github.com/kubernetes/kubernetes
@@ -987,15 +1094,24 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 EOF
-[root@YonXin-SIT-Master01 ~]# cp /data/kubernetes/service/kube-controller-manager.service /usr/lib/systemd/system/
-[root@YonXin-SIT-Master01 ~]# systemctl enable kube-controller-manager && systemctl restart kube-controller-manager
 ```
+
+```
+#chmod +x /data/kubernetes/service/kube-controller-manager.service
+#cp /data/kubernetes/service/kube-controller-manager.service /usr/lib/systemd/system/
+systemctl daemon-reload
+systemctl enable kube-controller-manager
+systemctl restart kube-controller-manager
+systemctl status kube-controller-manager
+```
+
+
 
 ### 6 创建kube-scheduler启动配置和脚本
 
 ```
-[root@YonXin-SIT-Master01 ~]# KUBE_CONFIG="/data/kubernetes/config/kube-scheduler.kubeconfig"
-KUBE_APISERVER="https://10.0.0.8:5443"
+KUBE_CONFIG="/data/kubernetes/config/kube-scheduler.kubeconfig"
+KUBE_APISERVER="https://172.100.3.100:5443"
 kubectl config set-cluster kubernetes \
   --certificate-authority=/data/kubernetes/pki/ca.pem \
   --embed-certs=true \
@@ -1011,14 +1127,20 @@ kubectl config set-context default \
   --user=kube-scheduler \
   --kubeconfig=${KUBE_CONFIG}
 kubectl config use-context default --kubeconfig=${KUBE_CONFIG}
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/config/kube-scheduler.conf << EOF
+```
+
+```
+#cat > /data/kubernetes/config/kube-scheduler.conf << EOF
 KUBE_SCHEDULER_OPTS="--logtostderr=false \\
 --v=2 \\
 --leader-elect \\
 --kubeconfig=/data/kubernetes/config/kube-scheduler.kubeconfig \\
 --bind-address=127.0.0.1"
 EOF
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/service/kube-scheduler.service << EOF
+```
+
+```
+#cat > /data/kubernetes/service/kube-scheduler.service << EOF
 [Unit]
 Description=Kubernetes Scheduler
 Documentation=https://github.com/kubernetes/kubernetes
@@ -1031,15 +1153,22 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 EOF
-[root@YonXin-SIT-Master01 ~]# cp /data/kubernetes/service/kube-scheduler.service /usr/lib/systemd/system/
-[root@YonXin-SIT-Master01 ~]# systemctl enable kube-scheduler && systemctl restart kube-scheduler
+```
+
+```
+#chmod +x /data/kubernetes/service/kube-scheduler.service
+#cp /data/kubernetes/service/kube-scheduler.service /usr/lib/systemd/system/
+systemctl daemon-reload
+systemctl enable kube-scheduler
+systemctl restart kube-scheduler
+systemctl status kube-scheduler
 ```
 
 ### 7 创建kubectl连接配置文件
 
 ```
-[root@YonXin-SIT-Master01 ~]# KUBE_CONFIG="/data/kubernetes/config/kubectl.kubeconfig"
-KUBE_APISERVER="https://10.0.0.8:5443"
+#KUBE_CONFIG="/data/kubernetes/config/kubectl.kubeconfig"
+KUBE_APISERVER="https://172.100.3.100:5443"
 kubectl config set-cluster kubernetes \
   --certificate-authority=/data/kubernetes/pki/ca.pem \
   --embed-certs=true \
@@ -1055,23 +1184,28 @@ kubectl config set-context default \
   --user=cluster-admin \
   --kubeconfig=${KUBE_CONFIG}
 kubectl config use-context default --kubeconfig=${KUBE_CONFIG}
-[root@YonXin-SIT-Master01 ~]# mkdir -p $HOME/.kube && sudo cp -i /data/kubernetes/config/kubectl.kubeconfig  $HOME/.kube/config
-[root@YonXin-SIT-Master01 ~]# sudo chown $(id -u):$(id -g) $HOME/.kube/config                         //生成kubectl(重要)
 ```
+
+```
+#mkdir -p $HOME/.kube && sudo cp -i /data/kubernetes/config/kubectl.kubeconfig  $HOME/.kube/config
+#sudo chown $(id -u):$(id -g) $HOME/.kube/config                         //生成kubectl(重要)
+```
+
+
 
 ### 8 授权kubelet-bootstrap用户允许请求证书
 
 ```
-[root@YonXin-SIT-Master01 ~]# kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
+#kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
 ```
 
 ### 9 创建kubelet启动配置和脚本
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/config/kubelet.conf << EOF
+#cat > /data/kubernetes/config/kubelet.conf << EOF
 KUBELET_OPTS="--logtostderr=false \\
 --v=2 \\
---hostname-override=YonXin-SIT-Master01 \\
+--hostname-override=k8s-master1 \\
 --cluster-domain=cluster.local \\
 --kubeconfig=/data/kubernetes/config/kubelet.kubeconfig \\
 --bootstrap-kubeconfig=/data/kubernetes/config/kubelet-bootstrap.kubeconfig \\
@@ -1083,7 +1217,10 @@ KUBELET_OPTS="--logtostderr=false \\
 --cgroup-driver=systemd \\
 --feature-gates=IPv6DualStack=true"
 EOF
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/config/kubelet-config.yml << EOF
+```
+
+```
+#cat > /data/kubernetes/config/kubelet-config.yml << EOF
 kind: KubeletConfiguration
 apiVersion: kubelet.config.k8s.io/v1beta1
 address: 0.0.0.0
@@ -1115,8 +1252,11 @@ evictionHard:
 maxOpenFiles: 1000000
 maxPods: 500
 EOF
-[root@YonXin-SIT-Master01 ~]# KUBE_CONFIG="/data/kubernetes/config/kubelet-bootstrap.kubeconfig"
-KUBE_APISERVER="https://10.0.0.8:5443" # apiserver IP:PORT
+```
+
+```
+#KUBE_CONFIG="/data/kubernetes/config/kubelet-bootstrap.kubeconfig"
+KUBE_APISERVER="https://172.100.3.100:5443" # apiserver IP:PORT
 kubectl config set-cluster kubernetes \
   --certificate-authority=/data/kubernetes/pki/ca.pem \
   --embed-certs=true \
@@ -1130,7 +1270,10 @@ kubectl config set-context default \
   --user="kubelet-bootstrap" \
   --kubeconfig=${KUBE_CONFIG}
 kubectl config use-context default --kubeconfig=${KUBE_CONFIG}
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/service/kubelet.service << EOF
+```
+
+```
+#cat > /data/kubernetes/service/kubelet.service << EOF
 [Unit]
 Description=Kubernetes Kubelet
 After=docker.service
@@ -1144,26 +1287,35 @@ LimitNOFILE=65536
 [Install]
 WantedBy=multi-user.target
 EOF
-[root@YonXin-SIT-Master01 ~]# cp /data/kubernetes/service/kubelet.service  /usr/lib/systemd/system/
-[root@YonXin-SIT-Master01 ~]# systemctl enable kubelet && systemctl restart kubelet && systemctl status kubelet
 ```
+
+```
+#chmod +x /data/kubernetes/service/kubelet.service
+cp /data/kubernetes/service/kubelet.service  /usr/lib/systemd/system/
+systemctl daemon-reload
+systemctl enable kubelet
+systemctl restart kubelet 
+systemctl status kubelet
+```
+
+
 
 ### 10 创建kube-proxy启动配置和脚本
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/config/kube-proxy.conf << EOF
+#cat > /data/kubernetes/config/kube-proxy.conf << EOF
 KUBE_PROXY_OPTS="--logtostderr=false \\
 --v=2 \\
 --config=/data/kubernetes/config/kube-proxy-config.yml"
 EOF
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/config/kube-proxy-config.yml << EOF
+#cat > /data/kubernetes/config/kube-proxy-config.yml << EOF
 kind: KubeProxyConfiguration
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
 bindAddress: 0.0.0.0
 metricsBindAddress: 0.0.0.0:10249
 clientConnection:
   kubeconfig: /data/kubernetes/config/kube-proxy.kubeconfig
-hostnameOverride: YonXin-SIT-Master01
+hostnameOverride: k8s-master1
 clusterCIDR: 10.244.0.0/16
 mode: ipvs
 ipvs:
@@ -1171,8 +1323,13 @@ ipvs:
 iptables:
   masqueradeAll: true
 EOF
-[root@YonXin-SIT-Master01 ~]# KUBE_CONFIG="/data/kubernetes/config/kube-proxy.kubeconfig"
-KUBE_APISERVER="https://10.0.0.8:5443"
+```
+
+
+
+```
+#KUBE_CONFIG="/data/kubernetes/config/kube-proxy.kubeconfig"
+KUBE_APISERVER="https://172.100.3.100:5443"
 kubectl config set-cluster kubernetes \
   --certificate-authority=/data/kubernetes/pki/ca.pem \
   --embed-certs=true \
@@ -1188,7 +1345,10 @@ kubectl config set-context default \
   --user=kube-proxy \
   --kubeconfig=${KUBE_CONFIG}
 kubectl config use-context default --kubeconfig=${KUBE_CONFIG}
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/service/kube-proxy.service << EOF
+```
+
+```
+#cat > /data/kubernetes/service/kube-proxy.service << EOF
 [Unit]
 Description=Kubernetes Proxy
 After=network.target
@@ -1202,24 +1362,33 @@ LimitNOFILE=65536
 [Install]
 WantedBy=multi-user.target
 EOF
-[root@YonXin-SIT-Master01 ~]# cp /data/kubernetes/service/kube-proxy.service  /usr/lib/systemd/system/
-[root@YonXin-SIT-Master01 ~]# systemctl enable kube-proxy && systemctl restart kube-proxy
 ```
+
+```
+#chmod +x /data/kubernetes/service/kube-proxy.service
+cp /data/kubernetes/service/kube-proxy.service  /usr/lib/systemd/system/
+systemctl daemon-reload
+systemctl enable kube-proxy 
+systemctl restart kube-proxy
+systemctl status kube-proxy
+```
+
+
 
 ### 11 批准kubelete证书申请并加入集群
 
 ```
-[root@YonXin-SIT-Master01 ~]# kubectl get csr                 //查看kubelet证书请求(重要)                      
-[root@YonXin-SIT-Master01 ~]# kubectl certificate approve     node-csr-XXXXXXXX           //批准kubelet证书申请(重要)
-[root@YonXin-SIT-Master01 ~]# kubectl get cs && kubectl get sa -A && kubectl get ns -A && kubectl get role -A //查看资源
-[root@YonXin-SIT-Master01 ~]# kubectl label node [nodename] node-role.kubernetes.io/master=                 //给master打标签
-[root@YonXin-SIT-Master01 ~]# kubectl label node [nodename] node-role.kubernetes.io/ingress=                 //给master打标签
+#kubectl get csr                 //查看kubelet证书请求(重要)                      
+#kubectl certificate approve     node-csr-XXXXXXXX           //批准kubelet证书申请(重要)
+#kubectl get cs && kubectl get sa -A && kubectl get ns -A && kubectl get role -A //查看资源
+#kubectl label node [nodename] node-role.kubernetes.io/master=                 //给master打标签
+#kubectl label node [nodename] node-role.kubernetes.io/ingress=                 //给master打标签
 ```
 
 ### 12 配置kubectl命令补全功能
 
 ```
-[root@YonXin-SIT-Master01 ~]# yum -y install  bash-completion
+#yum -y install  bash-completion
 chmod +x /usr/share/bash-completion/bash_completion
 /usr/share/bash-completion/bash_completion
 source /usr/share/bash-completion/bash_completion
@@ -1230,7 +1399,7 @@ echo "source <(kubectl completion bash)" >> /etc/bashrc
 ### 13 授权apiserver访问kubelet
 
 ```
-[root@YonXin-SIT-Master01 ~]# cat > /data/kubernetes/yaml/apiserver-to-kubelet-rbac.yaml << EOF
+#cat > /data/kubernetes/yaml/apiserver-to-kubelet-rbac.yaml << EOF
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
 metadata:
@@ -1266,7 +1435,7 @@ subjects:
     kind: User
     name: kubernetes
 EOF
-[root@YonXin-SIT-Master01 ~]# kubectl apply -f /data/kubernetes/yaml/apiserver-to-kubelet-rbac.yaml
+#kubectl apply -f /data/kubernetes/yaml/apiserver-to-kubelet-rbac.yaml
 ```
 
 ### 14 配置calico功能
@@ -1274,13 +1443,13 @@ EOF
 calico.yaml百度网盘下载链接：https://pan.baidu.com/s/1c5CaBpm5C-7xHuNQ9W7bqA 提取码：tpkt
 
 ```
-[root@YonXin-SIT-Master01 ~]# kubectl apply -f /data/kubernetes/yaml/calico.yaml
+#kubectl apply -f /data/kubernetes/yaml/calico.yaml
 ```
 
 ### 15 配置coredns功能
 
 ```
-[root@YonXin-SIT-Master01 ~]# vim /data/kubernetes/yaml/coredns.yaml
+#vim /data/kubernetes/yaml/coredns.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -1473,13 +1642,13 @@ spec:
   - name: metrics
     port: 9153
     protocol: TCP
-[root@YonXin-SIT-Master01 ~]# kubectl apply -f /data/kubernetes/yaml/coredns.yaml
+#kubectl apply -f /data/kubernetes/yaml/coredns.yaml
 ```
 
 ### 16 配置dashboard功能
 
 ```
-[root@YonXin-SIT-Master01 ~]# vim /data/kubernetes/yaml/dashboard.yaml
+#vim /data/kubernetes/yaml/dashboard.yaml
 # Copyright 2017 The Kubernetes Authors.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -1787,8 +1956,8 @@ spec:
       volumes:
         - name: tmp-volume
           emptyDir: {}
-[root@YonXin-SIT-Master01 ~]# kubectl apply -f /data/kubernetes/yaml/dashboard.yaml
-[root@YonXin-SIT-Master01 ~]# vim /data/kubernetes/yaml/dashboard-user.yaml
+#kubectl apply -f /data/kubernetes/yaml/dashboard.yaml
+#vim /data/kubernetes/yaml/dashboard-user.yaml
 apiVersion: v1
 kind: ServiceAccount
 metadata:
@@ -1807,8 +1976,8 @@ subjects:
 - kind: ServiceAccount
   name: admin-user
   namespace: kubernetes-dashboard
-[root@YonXin-SIT-Master01 ~]# kubectl apply -f /data/kubernetes/yaml/dashboard-user.yaml
-[root@YonXin-SIT-Master01 ~]# kubectl -n kubernetes-dashboard create token admin-user
+#kubectl apply -f /data/kubernetes/yaml/dashboard-user.yaml
+#kubectl -n kubernetes-dashboard create token admin-user
 ```
 
 ### 17 配置nginx-ingress-controller功能
@@ -2437,8 +2606,8 @@ webhooks:
 ```
 
 ```
-[root@YonXin-SIT-Master01 ~]# kubectl apply -f /data/kubernetes/yaml/nginx-ingress-controller.yaml
-[root@YonXin-SIT-Master01 ~]# vim /data/kubernetes/yaml/test-nginx.yaml
+#kubectl apply -f /data/kubernetes/yaml/nginx-ingress-controller.yaml
+#vim /data/kubernetes/yaml/test-nginx.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -2493,8 +2662,8 @@ spec:
             port:
               number: 80
 ---
-[root@YonXin-SIT-Master01 ~]# kubectl apply -f /data/kubernetes/yaml/test-nginx.yaml
-[root@YonXin-SIT-Master01 ~]# vim /data/kubernetes/yaml/test-tomcat.yaml
+#kubectl apply -f /data/kubernetes/yaml/test-nginx.yaml
+#vim /data/kubernetes/yaml/test-tomcat.yaml
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -2549,7 +2718,7 @@ spec:
             port:
               number: 8080
 ---
-[root@YonXin-SIT-Master01 ~]# kubectl apply -f /data/kubernetes/yaml/test-tomcat.yaml
+#kubectl apply -f /data/kubernetes/yaml/test-tomcat.yaml
 
 ```
 
@@ -2564,10 +2733,45 @@ C:\Windows\System32\drivers\etc\hosts
 
 部署Master0X 节点：将Master01所有K8s文件拷贝，删除如下文件，修改涉及配置启动所有服务即可~
 
+master1：
+
 ```
-[root@YonXin-SIT-Master02 ~]# rm -f /data/kubernetes/config/kubelet.kubeconfig && rm -f /data/kubernetes/pki/kubelet*
-[root@YonXin-SIT-Master02 ~]# kubectl get csr                                                                          //查看kubelet证书请求(重要)
-[root@YonXin-SIT-Master02 ~]# kubectl certificate approve     node-csr-XXXXXXXX           //批准kubelet证书申请(重要)
+scp -r /data/kubernetes/ k8s-master2:/data
+scp -r /data/kubernetes/ k8s-master3:/data
+scp -r ~/.kube/  k8s-master2:~
+scp -r ~/.kube/  k8s-master3:~
+```
+
+master2-3：
+
+```
+ cp /data/kubernetes/bin/kubectl /usr/bin/
+ cp /data/kubernetes/service/kube* /usr/lib/systemd/system/
+ 修改IP
+vim /data/kubernetes/config/kube-apiserver.conf
+
+systemctl daemon-reload
+systemctl enable kube-apiserver
+systemctl restart kube-apiserver
+systemctl status kube-apiserver
+systemctl enable kube-controller-manager
+systemctl restart kube-controller-manager
+systemctl status kube-controller-manager
+systemctl enable kube-scheduler
+systemctl restart kube-scheduler
+systemctl status kube-scheduler
+systemctl enable kubelet
+systemctl restart kubelet
+systemctl status kubelet
+systemctl enable kube-proxy
+systemctl restart kube-proxy
+systemctl status kube-proxy
+```
+
+```
+# rm -f /data/kubernetes/config/kubelet.kubeconfig && rm -f /data/kubernetes/pki/kubelet*
+# kubectl get csr                                                                          //查看kubelet证书请求(重要)
+# kubectl certificate approve     node-csr-XXXXXXXX           //批准kubelet证书申请(重要)
 ```
 
 ## 11. 安装新的k8s-node服务
@@ -2575,10 +2779,18 @@ C:\Windows\System32\drivers\etc\hosts
 部署新Node节点：将Master01所有K8s文件拷贝，删除如下文件，修改kubelet/kube-proxy配置启动服务~
 
 ```
-[root@YonXin-SIT-node01 ~]# rm -f /data/kubernetes/config/kubelet.kubeconfig && rm -f /data/kubernetes/pki/kubelet* 
-[root@YonXin-SIT-node01 ~]# kubectl get csr                                                                          //查看kubelet证书请求(重要)
-[root@YonXin-SIT-node01 ~]# kubectl certificate approve     node-csr-XXXXXXXX           //批准kubelet证书申请(重要)
-[root@YonXin-SIT-node01 ~]# kubectl label node [nodename] node-role.kubernetes.io/node=                   //给node打标签
+history scp -r ~/.kube/  k8s-node1:~
+scp -r ~/.kube/  k8s-node1:~
+
+```
+
+```
+# cp /data/kubernetes/bin/kubectl /usr/bin/
+# cp /data/kubernetes/service/kube* /usr/lib/systemd/system/
+# rm -f /data/kubernetes/config/kubelet.kubeconfig && rm -f /data/kubernetes/pki/kubelet* 
+# kubectl get csr                                                                          //查看kubelet证书请求(重要)
+# kubectl certificate approve     node-csr-XXXXXXXX           //批准kubelet证书申请(重要)
+# kubectl label node [nodename] node-role.kubernetes.io/node=                   //给node打标签
 ```
 
 ## 12. 日常运维服务
@@ -2587,14 +2799,14 @@ C:\Windows\System32\drivers\etc\hosts
 
 ```
 1.删除受损节点的成员信息
-[root@YonXin-SIT-Master01 ~]# etcdctl --endpoints="https://10.0.0.1:2379" --cacert=/data/etcd/cert/ca.pem --cert=/data/etcd/cert/etcd.pem --key=/data/etcd/cert/etcd-key.pem member remove fde9dd315b6d0b2
+#etcdctl --endpoints="https://172.100.3.116:2379" --cacert=/data/etcd/cert/ca.pem --cert=/data/etcd/cert/etcd.pem --key=/data/etcd/cert/etcd-key.pem member remove fde9dd315b6d0b2
 2.在受损节点上删除--data-dir存储的数据
-[root@YonXin-SIT-Master02 ~]# rm -rf /data/etcd/data/*
+[root@k8s-master2 ~]# rm -rf /data/etcd/data/*
 3.在受损节点上重新加入集群
-[root@YonXin-SIT-Master02 ~]# etcdctl member add etcd2 --peer-urls="https://10.0.0.2:2380" --endpoints="https://10.0.0.1:2379" --cacert=/data/etcd/cert/ca.pem --cert=/data/etcd/cert/etcd.pem --key=/data/etcd/cert/etcd-key.pem
+[root@k8s-master2 ~]# etcdctl member add etcd2 --peer-urls="https://172.100.3.117:2380" --endpoints="https://172.100.3.116:2379" --cacert=/data/etcd/cert/ca.pem --cert=/data/etcd/cert/etcd.pem --key=/data/etcd/cert/etcd-key.pem
 4.修改受损节点etcd启动参数
 将etcd.service的--initial-cluster-state启动参数，改为--initial-cluster-state=existing
 5.重启受损节点服务
-[root@YonXin-SIT-Master02 ~]# service etcd restart
+[root@k8s-master2 ~]# service etcd restart
 ```
 

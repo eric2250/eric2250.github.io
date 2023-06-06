@@ -39,6 +39,7 @@
   * [使用kubeadm搭建K8s1.27集群](k8s/Kubernetes1.27集群部署容器运行时为containerd.md)
   * [使用kubeadm搭建K8s高可用1.27集群](k8s/Kubernetes1.27高可用集群部署容器运行时为docker.md)    
   * [Kubernetes高可用集群二进制部署(Containerd)](k8s/Kubernetes高可用集群二进制部署Runtime-Containerd)
+  * [Kubernetes1.24.2高可用集群二进制部署(Containerd)](/k8s/二进制部署高可用K8S集群v1.24.2.md)
   * [使用sealos和Kuboard安装k8s](k8s/使用sealos和Kuboard安装k8s)
   * [kubernetes-dashboard部署](k8s/kubernetes-dashboard)
   * [kubernetes添加删除node](k8s/kubernetes添加删除node)
