@@ -735,7 +735,14 @@ kubectl delete pod POD_NAME --grace-period=0 --force
 kubectl patch pv xxx -p '{"metadata":{"finalizers":null}}'
 kubectl patch pvc xxx -p '{"metadata":{"finalizers":null}}'
 ```
-
+强制删除crd
+```
+kubectl patch crd/installations.operator.tigera.io -p '{"metadata":{"finalizers":[]}}' --type=merge
+```
+强制删除
+```
+kubectl patch installations.operator.tigera.io/default -p '{"metadata":{"finalizers":[]}}' --type=merge
+```
 
 
 git push 报错解决：
