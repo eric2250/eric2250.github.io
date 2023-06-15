@@ -8,15 +8,15 @@ Kubernetes（简称为：k8s）是Google在2014年6月开源的一个容器集�
 
 ## 1.1 主机规划
 
-| 主机IP地址     | 主机名      | 主机配置 | 主机角色    | 软件列表                                                     |
-| -------------- | ----------- | -------- | ----------- | ------------------------------------------------------------ |
-| 192.168.88.12  | k8s-master1 | 2C4G     | master      | kube-apiserver、kube-controller-manager、kube-scheduler、etcd、kubelet、kube-proxy、Containerd、runc |
-| 192.168.88.13  | k8s-master2 | 2C4G     | master      | kube-apiserver、kube-controller-manager、kube-scheduler、etcd、kubelet、kube-proxy、Containerd、runc |
-| 192.168.88.14  | k8s-master3 | 2C4G     | master      | kube-apiserver、kube-controller-manager、kube-scheduler、etcd、kubelet、kube-proxy、Containerd、runc |
-| 192.168.88.15  | k8s-worker1 | 2C4G     | worker      | kubelet、kube-proxy、Containerd、runc                        |
-| 192.168.88.10  | ha1         | 1C2G     | LB          | haproxy、keepalived                                          |
-| 192.168.88.11  | ha2         | 1C2G     | LB          | haproxy、keepalived                                          |
-| 192.168.88.100 | /           | /        | VIP(虚拟IP) |                                                              |
+| 主机IP地址    | 主机名      | 主机配置 | 主机角色    | 软件列表                                                     |
+| ------------- | ----------- | -------- | ----------- | ------------------------------------------------------------ |
+| 172.100.3.116 | k8s-master1 | 2C4G     | master      | kube-apiserver、kube-controller-manager、kube-scheduler、etcd、kubelet、kube-proxy、Containerd、runc |
+| 172.100.3.117 | k8s-master2 | 2C4G     | master      | kube-apiserver、kube-controller-manager、kube-scheduler、etcd、kubelet、kube-proxy、Containerd、runc |
+| 172.100.3.118 | k8s-master3 | 2C4G     | master      | kube-apiserver、kube-controller-manager、kube-scheduler、etcd、kubelet、kube-proxy、Containerd、runc |
+| 172.100.3.121 | k8s-node1   | 2C4G     | worker      | kubelet、kube-proxy、Containerd、runc                        |
+| 172.100.3.111 | ha1         | 1C2G     | LB          | haproxy、keepalived                                          |
+| 172.100.3.112 | ha2         | 1C2G     | LB          | haproxy、keepalived                                          |
+| 172.100.3.100 | /           | /        | VIP(虚拟IP) |                                                              |
 
 
 
@@ -38,11 +38,11 @@ Kubernetes（简称为：k8s）是Google在2014年6月开源的一个容器集�
 
 ## 1.3 网络分配
 
-| 网络名称    | 网段            | 备注 |
-| ----------- | --------------- | ---- |
-| Node网络    | 192.168.88.0/24 |      |
-| Service网络 | 10.96.0.0/16    |      |
-| Pod网络     | 10.244.0.0/16   |      |
+| 网络名称    | 网段           | 备注 |
+| ----------- | -------------- | ---- |
+| Node网络    | 172.100.3.0/24 |      |
+| Service网络 | 10.96.0.0/16   |      |
+| Pod网络     | 10.244.0.0/16  |      |
 
 
 
@@ -68,13 +68,13 @@ hostnamectl set-hostname xxx
 
 ~~~powershell
 cat >> /etc/hosts << EOF
-192.168.88.10 ha1
-192.168.88.11 ha2
-192.168.88.12 k8s-master1
-192.168.88.13 k8s-master2
-192.168.88.14 k8s-master3
-192.168.88.15 k8s-worker1
-192.168.88.16 k8s-worker2
+172.100.3.111 ha1
+172.100.3.112 ha2
+172.100.3.116 k8s-master1
+172.100.3.117 k8s-master2
+172.100.3.118 k8s-master3
+172.100.3.121 k8s-node1
+172.100.3.122 k8s-node2
 EOF
 ~~~
 
@@ -124,12 +124,15 @@ sysctl -p
 
 
 ~~~powershell
-安装软件
+# 安装软件
 yum -y install ntpdate
 
-制定时间同步计划任务
+# 制定时间同步计划任务
 crontab -e
 0 */1 * * * ntpdate time1.aliyun.com
+# 时区设置
+rm -rf /etc/localtime
+ln -s /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 ~~~
 
 
@@ -392,9 +395,9 @@ backend k8s-master
  option tcp-check
  balance roundrobin
  default-server inter 10s downinter 5s rise 2 fall 2 slowstart 60s maxconn 250 maxqueue 256 weight 100
- server  k8s-master1  192.168.88.12:6443 check
- server  k8s-master2  192.168.88.13:6443 check
- server  k8s-master3  192.168.88.14:6443 check
+ server  k8s-master1  172.100.3.116:6443 check
+ server  k8s-master2  172.100.3.117:6443 check
+ server  k8s-master3  172.100.3.118:6443 check
 EOF
 ~~~
 
@@ -426,7 +429,7 @@ rise 1
 vrrp_instance VI_1 {
    state MASTER
    interface eth0
-   mcast_src_ip 192.168.88.12
+   mcast_src_ip 172.100.3.111
    virtual_router_id 51
    priority 100
    advert_int 2
@@ -435,7 +438,7 @@ vrrp_instance VI_1 {
        auth_pass K8SHA_KA_AUTH
    }
    virtual_ipaddress {
-       192.168.88.100
+       172.100.3.100
    }
    track_script {
       chk_apiserver
@@ -466,7 +469,7 @@ rise 1
 vrrp_instance VI_1 {
    state BACKUP
    interface eth0
-   mcast_src_ip 192.168.88.15
+   mcast_src_ip 172.100.3.112
    virtual_router_id 51
    priority 99
    advert_int 2
@@ -475,7 +478,7 @@ vrrp_instance VI_1 {
        auth_pass K8SHA_KA_AUTH
    }
    virtual_ipaddress {
-       192.168.88.100
+       172.100.3.100
    }
    track_script {
       chk_apiserver
@@ -559,8 +562,8 @@ ssh-keygen -t rsa
 ssh-copy-id -i ~/.ssh/id_rsa.pub root@k8s-master1
 ssh-copy-id -i ~/.ssh/id_rsa.pub root@k8s-master2
 ssh-copy-id -i ~/.ssh/id_rsa.pub root@k8s-master3
-ssh-copy-id -i ~/.ssh/id_rsa.pub root@k8s-worker1
-ssh-copy-id -i ~/.ssh/id_rsa.pub root@k8s-worker2
+ssh-copy-id -i ~/.ssh/id_rsa.pub root@k8s-node1
+ssh-copy-id -i ~/.ssh/id_rsa.pub root@k8s-node2
 ~~~
 
 
@@ -654,12 +657,12 @@ cat > ca-csr.json <<"EOF"
       "C": "CN",
       "ST": "Beijing",
       "L": "Beijing",
-      "O": "kubemsb",
+      "O": "eastportk8s",
       "OU": "CN"
     }
   ],
   "ca": {
-          "expiry": "87600h"
+          "expiry": "876000h"
   }
 }
 EOF
@@ -693,7 +696,7 @@ cat > ca-config.json <<"EOF"
 {
   "signing": {
       "default": {
-          "expiry": "87600h"
+          "expiry": "876000h"
         },
       "profiles": {
           "kubernetes": {
@@ -703,7 +706,7 @@ cat > ca-config.json <<"EOF"
                   "server auth",
                   "client auth"
               ],
-              "expiry": "87600h"
+              "expiry": "876000h"
           }
       }
   }
@@ -734,9 +737,9 @@ cat > etcd-csr.json <<"EOF"
   "CN": "etcd",
   "hosts": [
     "127.0.0.1",
-    "192.168.88.12",
-    "192.168.88.13",
-    "192.168.88.14"
+    "172.100.3.116",
+    "172.100.3.117",
+    "172.100.3.118"
   ],
   "key": {
     "algo": "rsa",
@@ -746,7 +749,7 @@ cat > etcd-csr.json <<"EOF"
     "C": "CN",
     "ST": "Beijing",
     "L": "Beijing",
-    "O": "kubemsb",
+    "O": "eastportk8s",
     "OU": "CN"
   }]
 }
@@ -832,13 +835,13 @@ cat >  /etc/etcd/etcd.conf <<"EOF"
 #[Member]
 ETCD_NAME="etcd1"
 ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
-ETCD_LISTEN_PEER_URLS="https://192.168.88.12:2380"
-ETCD_LISTEN_CLIENT_URLS="https://192.168.88.12:2379,http://127.0.0.1:2379"
+ETCD_LISTEN_PEER_URLS="https://172.100.3.116:2380"
+ETCD_LISTEN_CLIENT_URLS="https://172.100.3.116:2379,http://127.0.0.1:2379"
 
 #[Clustering]
-ETCD_INITIAL_ADVERTISE_PEER_URLS="https://192.168.88.12:2380"
-ETCD_ADVERTISE_CLIENT_URLS="https://192.168.88.12:2379"
-ETCD_INITIAL_CLUSTER="etcd1=https://192.168.88.12:2380,etcd2=https://192.168.88.13:2380,etcd3=https://192.168.88.14:2380"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://172.100.3.116:2380"
+ETCD_ADVERTISE_CLIENT_URLS="https://172.100.3.116:2379"
+ETCD_INITIAL_CLUSTER="etcd1=https://172.100.3.116:2380,etcd2=https://172.100.3.117:2380,etcd3=https://172.100.3.118:2380"
 ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
 ETCD_INITIAL_CLUSTER_STATE="new"
 EOF
@@ -866,13 +869,13 @@ cat >  /etc/etcd/etcd.conf <<"EOF"
 #[Member]
 ETCD_NAME="etcd2"
 ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
-ETCD_LISTEN_PEER_URLS="https://192.168.88.13:2380"
-ETCD_LISTEN_CLIENT_URLS="https://192.168.88.13:2379,http://127.0.0.1:2379"
+ETCD_LISTEN_PEER_URLS="https://172.100.3.117:2380"
+ETCD_LISTEN_CLIENT_URLS="https://172.100.3.117:2379,http://127.0.0.1:2379"
 
 #[Clustering]
-ETCD_INITIAL_ADVERTISE_PEER_URLS="https://192.168.88.13:2380"
-ETCD_ADVERTISE_CLIENT_URLS="https://192.168.88.13:2379"
-ETCD_INITIAL_CLUSTER="etcd1=https://192.168.88.12:2380,etcd2=https://192.168.88.13:2380,etcd3=https://192.168.88.14:2380"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://172.100.3.117:2380"
+ETCD_ADVERTISE_CLIENT_URLS="https://172.100.3.117:2379"
+ETCD_INITIAL_CLUSTER="etcd1=https://172.100.3.116:2380,etcd2=https://172.100.3.117:2380,etcd3=https://172.100.3.118:2380"
 ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
 ETCD_INITIAL_CLUSTER_STATE="new"
 EOF
@@ -887,13 +890,13 @@ cat >  /etc/etcd/etcd.conf <<"EOF"
 #[Member]
 ETCD_NAME="etcd3"
 ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
-ETCD_LISTEN_PEER_URLS="https://192.168.88.14:2380"
-ETCD_LISTEN_CLIENT_URLS="https://192.168.88.14:2379,http://127.0.0.1:2379"
+ETCD_LISTEN_PEER_URLS="https://172.100.3.118:2380"
+ETCD_LISTEN_CLIENT_URLS="https://172.100.3.118:2379,http://127.0.0.1:2379"
 
 #[Clustering]
-ETCD_INITIAL_ADVERTISE_PEER_URLS="https://192.168.88.14:2380"
-ETCD_ADVERTISE_CLIENT_URLS="https://192.168.88.14:2379"
-ETCD_INITIAL_CLUSTER="etcd1=https://192.168.88.12:2380,etcd2=https://192.168.88.13:2380,etcd3=https://192.168.88.14:2380"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="https://172.100.3.118:2380"
+ETCD_ADVERTISE_CLIENT_URLS="https://172.100.3.118:2379"
+ETCD_INITIAL_CLUSTER="etcd1=https://172.100.3.116:2380,etcd2=https://172.100.3.117:2380,etcd3=https://172.100.3.118:2380"
 ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster"
 ETCD_INITIAL_CLUSTER_STATE="new"
 EOF
@@ -984,7 +987,7 @@ systemctl status etcd
 
 
 ~~~powershell
-ETCDCTL_API=3 /usr/local/bin/etcdctl --write-out=table --cacert=/etc/etcd/ssl/ca.pem --cert=/etc/etcd/ssl/etcd.pem --key=/etc/etcd/ssl/etcd-key.pem --endpoints=https://192.168.88.12:2379,https://192.168.88.13:2379,https://192.168.88.14:2379 endpoint health
+ETCDCTL_API=3 /usr/local/bin/etcdctl --write-out=table --cacert=/etc/etcd/ssl/ca.pem --cert=/etc/etcd/ssl/etcd.pem --key=/etc/etcd/ssl/etcd-key.pem --endpoints=https://172.100.3.116:2379,https://172.100.3.117:2379,https://172.100.3.118:2379 endpoint health
 ~~~
 
 
@@ -993,9 +996,9 @@ ETCDCTL_API=3 /usr/local/bin/etcdctl --write-out=table --cacert=/etc/etcd/ssl/ca
 +----------------------------+--------+-------------+-------+
 |          ENDPOINT          | HEALTH |    TOOK     | ERROR |
 +----------------------------+--------+-------------+-------+
-| https://192.168.88.14:2379 |   true | 10.393062ms |       |
-| https://192.168.88.12:2379 |   true |  15.70437ms |       |
-| https://192.168.88.13:2379 |   true | 15.871684ms |       |
+| https://172.100.3.118:2379 |   true | 10.393062ms |       |
+| https://172.100.3.116:2379 |   true |  15.70437ms |       |
+| https://172.100.3.117:2379 |   true | 15.871684ms |       |
 +----------------------------+--------+-------------+-------+
 ~~~
 
@@ -1003,7 +1006,7 @@ ETCDCTL_API=3 /usr/local/bin/etcdctl --write-out=table --cacert=/etc/etcd/ssl/ca
 
 ~~~powershell
 检查ETCD数据库性能
-ETCDCTL_API=3 /usr/local/bin/etcdctl --write-out=table --cacert=/etc/etcd/ssl/ca.pem --cert=/etc/etcd/ssl/etcd.pem --key=/etc/etcd/ssl/etcd-key.pem --endpoints=https://192.168.88.12:2379,https://192.168.88.13:2379,https://192.168.88.14:2379 check perf
+ETCDCTL_API=3 /usr/local/bin/etcdctl --write-out=table --cacert=/etc/etcd/ssl/ca.pem --cert=/etc/etcd/ssl/etcd.pem --key=/etc/etcd/ssl/etcd-key.pem --endpoints=https://172.100.3.116:2379,https://172.100.3.117:2379,https://172.100.3.118:2379 check perf
 ~~~
 
 
@@ -1019,7 +1022,7 @@ PASS
 
 
 ~~~powershell
-ETCDCTL_API=3 /usr/local/bin/etcdctl --write-out=table --cacert=/etc/etcd/ssl/ca.pem --cert=/etc/etcd/ssl/etcd.pem --key=/etc/etcd/ssl/etcd-key.pem --endpoints=https://192.168.88.12:2379,https://192.168.88.13:2379,https://192.168.88.14:2379 member list
+ETCDCTL_API=3 /usr/local/bin/etcdctl --write-out=table --cacert=/etc/etcd/ssl/ca.pem --cert=/etc/etcd/ssl/etcd.pem --key=/etc/etcd/ssl/etcd-key.pem --endpoints=https://172.100.3.116:2379,https://172.100.3.117:2379,https://172.100.3.118:2379 member list
 ~~~
 
 
@@ -1028,16 +1031,16 @@ ETCDCTL_API=3 /usr/local/bin/etcdctl --write-out=table --cacert=/etc/etcd/ssl/ca
 +------------------+---------+-------+----------------------------+----------------------------+------------+
 |        ID        | STATUS  | NAME  |         PEER ADDRS         |        CLIENT ADDRS        | IS LEARNER |
 +------------------+---------+-------+----------------------------+----------------------------+------------+
-| 9b449b0ff1d4c375 | started | etcd1 | https://192.168.88.12:2380 | https://192.168.88.12:2379 |      false |
-| d1fbb74bc6a61e5c | started | etcd2 | https://192.168.88.13:2380 | https://192.168.88.13:2379 |      false |
-| f60b205fb02fe23c | started | etcd3 | https://192.168.88.14:2380 | https://192.168.88.14:2379 |      false |
+| 9b449b0ff1d4c375 | started | etcd1 | https://172.100.3.116:2380 | https://172.100.3.116:2379 |      false |
+| d1fbb74bc6a61e5c | started | etcd2 | https://172.100.3.117:2380 | https://172.100.3.117:2379 |      false |
+| f60b205fb02fe23c | started | etcd3 | https://172.100.3.118:2380 | https://172.100.3.118:2379 |      false |
 +------------------+---------+-------+----------------------------+----------------------------+------------+
 ~~~
 
 
 
 ~~~powershell
-ETCDCTL_API=3 /usr/local/bin/etcdctl --write-out=table --cacert=/etc/etcd/ssl/ca.pem --cert=/etc/etcd/ssl/etcd.pem --key=/etc/etcd/ssl/etcd-key.pem --endpoints=https://192.168.88.12:2379,https://192.168.88.13:2379,https://192.168.88.14:2379 endpoint status
+ETCDCTL_API=3 /usr/local/bin/etcdctl --write-out=table --cacert=/etc/etcd/ssl/ca.pem --cert=/etc/etcd/ssl/etcd.pem --key=/etc/etcd/ssl/etcd-key.pem --endpoints=https://172.100.3.116:2379,https://172.100.3.117:2379,https://172.100.3.118:2379 endpoint status
 ~~~
 
 
@@ -1046,9 +1049,9 @@ ETCDCTL_API=3 /usr/local/bin/etcdctl --write-out=table --cacert=/etc/etcd/ssl/ca
 +----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
 |          ENDPOINT          |        ID        | VERSION | DB SIZE | IS LEADER | IS LEARNER | RAFT TERM | RAFT INDEX | RAFT APPLIED INDEX | ERRORS |
 +----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
-| https://192.168.88.12:2379 | 9b449b0ff1d4c375 |   3.5.2 |   24 MB |      true |      false |         2 |     403774 |             403774 |        |
-| https://192.168.88.13:2379 | d1fbb74bc6a61e5c |   3.5.2 |   24 MB |     false |      false |         2 |     403774 |             403774 |        |
-| https://192.168.88.14:2379 | f60b205fb02fe23c |   3.5.2 |   24 MB |     false |      false |         2 |     403774 |             403774 |        |
+| https://172.100.3.116:2379 | 9b449b0ff1d4c375 |   3.5.2 |   24 MB |      true |      false |         2 |     403774 |             403774 |        |
+| https://172.100.3.117:2379 | d1fbb74bc6a61e5c |   3.5.2 |   24 MB |     false |      false |         2 |     403774 |             403774 |        |
+| https://172.100.3.118:2379 | f60b205fb02fe23c |   3.5.2 |   24 MB |     false |      false |         2 |     403774 |             403774 |        |
 +----------------------------+------------------+---------+---------+-----------+------------+-----------+------------+--------------------+--------+
 ~~~
 
@@ -1098,8 +1101,8 @@ scp kube-apiserver kube-controller-manager kube-scheduler kubectl k8s-master3:/u
 scp kubelet kube-proxy k8s-master1:/usr/local/bin
 scp kubelet kube-proxy k8s-master2:/usr/local/bin
 scp kubelet kube-proxy k8s-master3:/usr/local/bin
-scp kubelet kube-proxy k8s-worker1:/usr/local/bin
-scp kubelet kube-proxy k8s-worker2:/usr/local/bin
+scp kubelet kube-proxy k8s-node1:/usr/local/bin
+scp kubelet kube-proxy k8s-node2:/usr/local/bin
 ~~~
 
 
@@ -1121,6 +1124,8 @@ mkdir -p /var/log/kubernetes
 #### 2.5.5.1 创建apiserver证书请求文件
 
 > 所有master节点
+>
+> master1:
 
 ~~~powershell
 cat > kube-apiserver-csr.json << "EOF"
@@ -1128,16 +1133,16 @@ cat > kube-apiserver-csr.json << "EOF"
 "CN": "kubernetes",
   "hosts": [
     "127.0.0.1",
-    "192.168.88.12",
-    "192.168.88.13",
-    "192.168.88.14",
-    "192.168.88.15",
-    "192.168.88.16",
-    "192.168.88.17",
-    "192.168.88.18",
-    "192.168.88.19",
-    "192.168.88.20",
-    "192.168.88.100",
+    "172.100.3.116",
+    "172.100.3.117",
+    "172.100.3.118",
+    "172.100.3.121",
+    "172.100.3.122",
+    "172.100.3.119",
+    "172.100.3.120",
+    "172.100.3.123",
+    "172.100.3.124",
+    "172.100.3.100",
     "10.96.0.1",
     "kubernetes",
     "kubernetes.default",
@@ -1154,7 +1159,7 @@ cat > kube-apiserver-csr.json << "EOF"
       "C": "CN",
       "ST": "Beijing",
       "L": "Beijing",
-      "O": "kubemsb",
+      "O": "eastportk8s",
       "OU": "CN"
     }
   ]
@@ -1206,9 +1211,9 @@ master1：
 cat > /etc/kubernetes/kube-apiserver.conf << "EOF"
 KUBE_APISERVER_OPTS="--enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \
   --anonymous-auth=false \
-  --bind-address=192.168.88.12 \
+  --bind-address=172.100.3.116 \
   --secure-port=6443 \
-  --advertise-address=192.168.88.12 \
+  --advertise-address=172.100.3.116 \
   --insecure-port=0 \
   --authorization-mode=Node,RBAC \
   --runtime-config=api/all=true \
@@ -1227,7 +1232,7 @@ KUBE_APISERVER_OPTS="--enable-admission-plugins=NamespaceLifecycle,NodeRestricti
   --etcd-cafile=/etc/etcd/ssl/ca.pem \
   --etcd-certfile=/etc/etcd/ssl/etcd.pem \
   --etcd-keyfile=/etc/etcd/ssl/etcd-key.pem \
-  --etcd-servers=https://192.168.88.12:2379,https://192.168.88.13:2379,https://192.168.88.14:2379 \
+  --etcd-servers=https://172.100.3.116:2379,https://172.100.3.117:2379,https://172.100.3.118:2379 \
   --enable-swagger-ui=true \
   --allow-privileged=true \
   --apiserver-count=3 \
@@ -1250,9 +1255,9 @@ master2：
 cat > /etc/kubernetes/kube-apiserver.conf << "EOF"
 KUBE_APISERVER_OPTS="--enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \
   --anonymous-auth=false \
-  --bind-address=192.168.88.13 \
+  --bind-address=172.100.3.117 \
   --secure-port=6443 \
-  --advertise-address=192.168.88.13 \
+  --advertise-address=172.100.3.117 \
   --insecure-port=0 \
   --authorization-mode=Node,RBAC \
   --runtime-config=api/all=true \
@@ -1271,7 +1276,7 @@ KUBE_APISERVER_OPTS="--enable-admission-plugins=NamespaceLifecycle,NodeRestricti
   --etcd-cafile=/etc/etcd/ssl/ca.pem \
   --etcd-certfile=/etc/etcd/ssl/etcd.pem \
   --etcd-keyfile=/etc/etcd/ssl/etcd-key.pem \
-  --etcd-servers=https://192.168.88.12:2379,https://192.168.88.13:2379,https://192.168.88.14:2379 \
+  --etcd-servers=https://172.100.3.116:2379,https://172.100.3.117:2379,https://172.100.3.118:2379 \
   --enable-swagger-ui=true \
   --allow-privileged=true \
   --apiserver-count=3 \
@@ -1293,9 +1298,9 @@ master3：
 cat > /etc/kubernetes/kube-apiserver.conf << "EOF"
 KUBE_APISERVER_OPTS="--enable-admission-plugins=NamespaceLifecycle,NodeRestriction,LimitRanger,ServiceAccount,DefaultStorageClass,ResourceQuota \
   --anonymous-auth=false \
-  --bind-address=192.168.88.14 \
+  --bind-address=172.100.3.118 \
   --secure-port=6443 \
-  --advertise-address=192.168.88.14 \
+  --advertise-address=172.100.3.118 \
   --insecure-port=0 \
   --authorization-mode=Node,RBAC \
   --runtime-config=api/all=true \
@@ -1314,7 +1319,7 @@ KUBE_APISERVER_OPTS="--enable-admission-plugins=NamespaceLifecycle,NodeRestricti
   --etcd-cafile=/etc/etcd/ssl/ca.pem \
   --etcd-certfile=/etc/etcd/ssl/etcd.pem \
   --etcd-keyfile=/etc/etcd/ssl/etcd-key.pem \
-  --etcd-servers=https://192.168.88.12:2379,https://192.168.88.13:2379,https://192.168.88.14:2379 \
+  --etcd-servers=https://172.100.3.116:2379,https://172.100.3.117:2379,https://172.100.3.118:2379 \
   --enable-swagger-ui=true \
   --allow-privileged=true \
   --apiserver-count=3 \
@@ -1394,10 +1399,10 @@ systemctl enable --now kube-apiserver
 systemctl status kube-apiserver
 
 # 测试
-curl --insecure https://192.168.88.12:6443/
-curl --insecure https://192.168.88.13:6443/
-curl --insecure https://192.168.88.14:6443/
-curl --insecure https://192.168.88.100:6443/
+curl --insecure https://172.100.3.116:6443/
+curl --insecure https://172.100.3.117:6443/
+curl --insecure https://172.100.3.118:6443/
+curl --insecure https://172.100.3.100:6443/
 ~~~
 
 
@@ -1461,6 +1466,8 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 
 ~~~powershell
 cp admin*.pem /etc/kubernetes/ssl/
+scp admin*.pem k8s-master2:/etc/kubernetes/ssl/
+scp admin*.pem k8s-master3:/etc/kubernetes/ssl/
 ~~~
 
 
@@ -1472,7 +1479,7 @@ kube.config 为 kubectl 的配置文件，包含访问 apiserver 的所有信息
 
 
 ~~~powershell
-kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server=https://192.168.88.100:6443 --kubeconfig=kube.config
+kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server=https://172.100.3.100:6443 --kubeconfig=kube.config
 
 kubectl config set-credentials admin --client-certificate=admin.pem --client-key=admin-key.pem --embed-certs=true --kubeconfig=kube.config
 
@@ -1523,8 +1530,12 @@ kubectl get all --all-namespaces
 ~~~powershell
 ssh k8s-master2 mkdir /root/.kube
 ssh k8s-master3 mkdir /root/.kube
+ssh k8s-node1 mkdir /root/.kube
+ssh k8s-node2 mkdir /root/.kube
 scp /root/.kube/config k8s-master2:/root/.kube/config
 scp /root/.kube/config k8s-master3:/root/.kube/config
+scp /root/.kube/config k8s-node1:/root/.kube/config
+scp /root/.kube/config k8s-node2:/root/.kube/config
 ~~~
 
 
@@ -1532,12 +1543,12 @@ scp /root/.kube/config k8s-master3:/root/.kube/config
 
 
 ~~~powershell
-yum install -y bash-completion
+#yum -y install  bash-completion
+chmod +x /usr/share/bash-completion/bash_completion
+/usr/share/bash-completion/bash_completion
 source /usr/share/bash-completion/bash_completion
 source <(kubectl completion bash)
-kubectl completion bash > ~/.kube/completion.bash.inc
-source '/root/.kube/completion.bash.inc'  
-source $HOME/.bash_profile
+echo "source <(kubectl completion bash)" >> /etc/bashrc
 ~~~
 
 
@@ -1558,9 +1569,9 @@ cat > kube-controller-manager-csr.json << "EOF"
     },
     "hosts": [
       "127.0.0.1",
-      "192.168.88.12",
-      "192.168.88.13",
-      "192.168.88.14"
+      "172.100.3.116",
+      "172.100.3.117",
+      "172.100.3.118"
     ],
     "names": [
       {
@@ -1598,7 +1609,7 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 
 
 ~~~powershell
-# ls
+# ls |grep kube-controller-manager
 
 kube-controller-manager.csr     
 kube-controller-manager-csr.json
@@ -1613,7 +1624,7 @@ kube-controller-manager.pem
 
 
 ~~~powershell
-kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server=https://192.168.88.100:6443 --kubeconfig=kube-controller-manager.kubeconfig
+kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server=https://172.100.3.100:6443 --kubeconfig=kube-controller-manager.kubeconfig
 
 kubectl config set-credentials system:kube-controller-manager --client-certificate=kube-controller-manager.pem --client-key=kube-controller-manager-key.pem --embed-certs=true --kubeconfig=kube-controller-manager.kubeconfig
 
@@ -1630,9 +1641,8 @@ kubectl config use-context system:kube-controller-manager --kubeconfig=kube-cont
 
 ~~~powershell
 cat > kube-controller-manager.conf << "EOF"
-KUBE_CONTROLLER_MANAGER_OPTS="--port=10252 \
-  --secure-port=10257 \
-  --bind-address=127.0.0.1 \
+KUBE_CONTROLLER_MANAGER_OPTS="--secure-port=10257 \
+  --bind-address=0.0.0.0 \
   --kubeconfig=/etc/kubernetes/kube-controller-manager.kubeconfig \
   --service-cluster-ip-range=10.96.0.0/16 \
   --cluster-name=kubernetes \
@@ -1640,14 +1650,12 @@ KUBE_CONTROLLER_MANAGER_OPTS="--port=10252 \
   --cluster-signing-key-file=/etc/kubernetes/ssl/ca-key.pem \
   --allocate-node-cidrs=true \
   --cluster-cidr=10.244.0.0/16 \
-  --experimental-cluster-signing-duration=87600h \
+  --experimental-cluster-signing-duration=876000h \
   --root-ca-file=/etc/kubernetes/ssl/ca.pem \
   --service-account-private-key-file=/etc/kubernetes/ssl/ca-key.pem \
   --leader-elect=true \
   --feature-gates=RotateKubeletServerCertificate=true \
   --controllers=*,bootstrapsigner,tokencleaner \
-  --horizontal-pod-autoscaler-use-rest-clients=true \
-  --horizontal-pod-autoscaler-sync-period=10s \
   --tls-cert-file=/etc/kubernetes/ssl/kube-controller-manager.pem \
   --tls-private-key-file=/etc/kubernetes/ssl/kube-controller-manager-key.pem \
   --use-service-account-credentials=true \
@@ -1657,6 +1665,14 @@ KUBE_CONTROLLER_MANAGER_OPTS="--port=10252 \
   --v=2"
 EOF
 ~~~
+
+1.23删除：
+
+```
+  --port=10252 \
+  --horizontal-pod-autoscaler-use-rest-clients=true \
+  --horizontal-pod-autoscaler-sync-period=10s \
+```
 
 
 
@@ -1726,7 +1742,13 @@ systemctl enable --now kube-controller-manager
 systemctl status kube-controller-manager
 ~~~
 
+报错：
 
+```
+invalid port value 10252: only zero is allowed
+```
+
+​	解决：删除 --port=10252
 
 ~~~powershell
 kubectl get componentstatuses
@@ -1748,9 +1770,9 @@ cat > kube-scheduler-csr.json << "EOF"
     "CN": "system:kube-scheduler",
     "hosts": [
       "127.0.0.1",
-      "192.168.88.12",
-      "192.168.88.13",
-      "192.168.88.14"
+      "172.100.3.116",
+      "172.100.3.117",
+      "172.100.3.118"
     ],
     "key": {
         "algo": "rsa",
@@ -1796,7 +1818,7 @@ kube-scheduler.pem
 
 
 ~~~powershell
-kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server=https://192.168.88.100:6443 --kubeconfig=kube-scheduler.kubeconfig
+kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server=https://172.100.3.100:6443 --kubeconfig=kube-scheduler.kubeconfig
 
 kubectl config set-credentials system:kube-scheduler --client-certificate=kube-scheduler.pem --client-key=kube-scheduler-key.pem --embed-certs=true --kubeconfig=kube-scheduler.kubeconfig
 
@@ -1921,8 +1943,8 @@ usr
 scp -r etc opt/ usr/ k8s-master1:/
 scp -r etc opt/ usr/ k8s-master2:/
 scp -r etc opt/ usr/ k8s-master3:/
-scp -r etc opt/ usr/ k8s-worker1:/
-scp -r etc opt/ usr/ k8s-worker2:/
+scp -r etc opt/ usr/ k8s-node1:/
+scp -r etc opt/ usr/ k8s-node2:/
 
 ##### 2.5.9.1.3 生成配置文件并修改
 
@@ -1950,7 +1972,7 @@ sed -i 's@systemd_cgroup = false@systemd_cgroup = true@' /etc/containerd/config.
 
 ~~~powershell
 下面的配置文件中已修改，可不执行，仅修改默认时执行。
-sed -i 's@k8s.gcr.io/pause:3.6@registry.aliyuncs.com/google_containers/pause:3.6@' /etc/containerd/config.toml
+sed -i 's@k8s.gcr.io/pause:3.86@registry.aliyuncs.com/google_containers/pause:3.8@' /etc/containerd/config.toml
 ~~~
 
 
@@ -1988,7 +2010,7 @@ oom_score = -999
     stream_server_address = "127.0.0.1"
     stream_server_port = "0"
     enable_selinux = false
-    sandbox_image = "registry.aliyuncs.com/google_containers/pause:3.6"
+    sandbox_image = "registry.aliyuncs.com/google_containers/pause:3.8"
     stats_collect_period = 10
     systemd_cgroup = true
     enable_tls_streaming = false
@@ -2027,9 +2049,9 @@ oom_score = -999
           endpoint = [
             "https://quay.mirrors.ustc.edu.cn"
           ]
-        [plugins.cri.registry.mirrors."harbor.kubemsb.com"]
+        [plugins.cri.registry.mirrors."harbor.eastportk8s.com"]
           endpoint = [
-            "http://harbor.kubemsb.com"
+            "http://harbor.eastportk8s.com"
           ]
     [plugins.cri.x509_key_pair_streaming]
       tls_cert_file = ""
@@ -2080,8 +2102,8 @@ chmod +x runc.amd64
 scp runc.amd64 k8s-master1:/usr/local/sbin/runc
 scp runc.amd64 k8s-master2:/usr/local/sbin/runc
 scp runc.amd64 k8s-master3:/usr/local/sbin/runc
-scp runc.amd64 k8s-worker1:/usr/local/sbin/runc
-scp runc.amd64 k8s-worker2:/usr/local/sbin/runc
+scp runc.amd64 k8s-node1:/usr/local/sbin/runc
+scp runc.amd64 k8s-node2:/usr/local/sbin/runc
 ~~~
 
 
@@ -2117,7 +2139,7 @@ systemctl status containerd
 ~~~powershell
 BOOTSTRAP_TOKEN=$(awk -F "," '{print $1}' /etc/kubernetes/token.csv)
 
-kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server=https://192.168.88.100:6443 --kubeconfig=kubelet-bootstrap.kubeconfig
+kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server=https://172.100.3.100:6443 --kubeconfig=kubelet-bootstrap.kubeconfig
 
 kubectl config set-credentials kubelet-bootstrap --token=${BOOTSTRAP_TOKEN} --kubeconfig=kubelet-bootstrap.kubeconfig
 
@@ -2172,7 +2194,7 @@ cat > kubelet.json << "EOF"
       "cacheUnauthorizedTTL": "30s"
     }
   },
-  "address": "192.168.88.12",
+  "address": "172.100.3.116",
   "port": 10250,
   "readOnlyPort": 10255,
   "cgroupDriver": "systemd",                    
@@ -2209,7 +2231,7 @@ ExecStart=/usr/local/bin/kubelet \
   --container-runtime-endpoint=unix:///run/containerd/containerd.sock \
   --network-plugin=cni \
   --rotate-certificates \
-  --pod-infra-container-image=registry.aliyuncs.com/google_containers/pause:3.2 \
+  --pod-infra-container-image=registry.aliyuncs.com/google_containers/pause:3.8 \
   --root-dir=/etc/cni/net.d \
   --alsologtostderr=true \
   --logtostderr=false \
@@ -2240,11 +2262,11 @@ cp kubelet.service /usr/lib/systemd/system/
 
 
 ~~~powershell
-for i in  k8s-master2 k8s-master3 k8s-worker1 k8s-worker2;do scp kubelet-bootstrap.kubeconfig kubelet.json $i:/etc/kubernetes/;done
+for i in  k8s-master2 k8s-master3 k8s-node1 k8s-node2;do scp kubelet-bootstrap.kubeconfig kubelet.json $i:/etc/kubernetes/;done
 
-for i in  k8s-master2 k8s-master3 k8s-worker1 k8s-worker2;do scp ca.pem $i:/etc/kubernetes/ssl/;done
+for i in  k8s-master2 k8s-master3 k8s-node1 k8s-node2;do scp ca.pem $i:/etc/kubernetes/ssl/;done
 
-for i in k8s-master2 k8s-master3 k8s-worker1 k8s-worker2;do scp kubelet.service $i:/usr/lib/systemd/system/;done
+for i in k8s-master2 k8s-master3 k8s-node1 k8s-node2;do scp kubelet.service $i:/usr/lib/systemd/system/;done
 ~~~
 
 
@@ -2263,6 +2285,8 @@ kubelet.json中address需要修改为当前主机IP地址。
 
 
 ~~~powershell
+rm -rf /var/lib/kubelet
+rm -rf /var/log/kubernetes
 mkdir -p /var/lib/kubelet
 mkdir -p /var/log/kubernetes
 ~~~
@@ -2274,9 +2298,10 @@ systemctl daemon-reload
 systemctl enable --now kubelet
 
 systemctl status kubelet
+journalctl -xefu kubelet
 ~~~
 
-
+部署完最好重启一下
 
 ~~~powershell
 # kubectl get nodes
@@ -2284,7 +2309,7 @@ NAME          STATUS     ROLES    AGE     VERSION
 k8s-master1   NotReady   <none>   2m55s   v1.21.10
 k8s-master2   NotReady   <none>   45s     v1.21.10
 k8s-master3   NotReady   <none>   39s     v1.21.10
-k8s-worker1   NotReady   <none>   5m1s    v1.21.10
+k8s-node1   NotReady   <none>   5m1s    v1.21.10
 ~~~
 
 
@@ -2330,7 +2355,7 @@ cat > kube-proxy-csr.json << "EOF"
       "C": "CN",
       "ST": "Beijing",
       "L": "Beijing",
-      "O": "kubemsb",
+      "O": "eastportk8s",
       "OU": "CN"
     }
   ]
@@ -2362,7 +2387,7 @@ kube-proxy.csr  kube-proxy-csr.json  kube-proxy-key.pem  kube-proxy.pem
 
 
 ~~~powershell
-kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server=https://192.168.88.100:6443 --kubeconfig=kube-proxy.kubeconfig
+kubectl config set-cluster kubernetes --certificate-authority=ca.pem --embed-certs=true --server=https://172.100.3.100:6443 --kubeconfig=kube-proxy.kubeconfig
 
 kubectl config set-credentials kube-proxy --client-certificate=kube-proxy.pem --client-key=kube-proxy-key.pem --embed-certs=true --kubeconfig=kube-proxy.kubeconfig
 
@@ -2380,13 +2405,13 @@ kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig
 ~~~powershell
 cat > kube-proxy.yaml << "EOF"
 apiVersion: kubeproxy.config.k8s.io/v1alpha1
-bindAddress: 192.168.88.12
+bindAddress: 172.100.3.116
 clientConnection:
   kubeconfig: /etc/kubernetes/kube-proxy.kubeconfig
 clusterCIDR: 10.244.0.0/16
-healthzBindAddress: 192.168.88.12:10256
+healthzBindAddress: 172.100.3.116:10256
 kind: KubeProxyConfiguration
-metricsBindAddress: 192.168.88.12:10249
+metricsBindAddress: 172.100.3.116:10249
 mode: "ipvs"
 EOF
 ~~~
@@ -2439,8 +2464,8 @@ cp kube-proxy.service /usr/lib/systemd/system/
 
 
 ~~~powershell
-for i in k8s-master2 k8s-master3 k8s-worker1 k8s-worker2;do scp kube-proxy.kubeconfig kube-proxy.yaml $i:/etc/kubernetes/;done
-for i in k8s-master2 k8s-master3 k8s-worker1 k8s-worker2;do scp  kube-proxy.service $i:/usr/lib/systemd/system/;done
+for i in k8s-master2 k8s-master3 k8s-node1 k8s-node2;do scp kube-proxy.kubeconfig kube-proxy.yaml $i:/etc/kubernetes/;done
+for i in k8s-master2 k8s-master3 k8s-node1 k8s-node2;do scp  kube-proxy.service $i:/usr/lib/systemd/system/;done
 ~~~
 
 
@@ -2477,17 +2502,18 @@ systemctl status kube-proxy
 
 #### 2.5.10.1 下载
 
+[Quickstart for Calico on Kubernetes | Calico Documentation (tigera.io)](https://docs.tigera.io/calico/latest/getting-started/kubernetes/quickstart)
+
 ~~~powershell
-wget https://docs.projectcalico.org/v3.19/manifests/calico.yaml --no-check-certificate
+kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/tigera-operator.yaml
 ~~~
-
-
 
 #### 2.5.10.2 修改文件
 
-
-
 ~~~powershell
+# wget https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/custom-resources.yaml
+
+# vim custom-resources.yaml
 3683             - name: CALICO_IPV4POOL_CIDR
 3684               value: "10.244.0.0/16"
 ~~~
@@ -2496,13 +2522,9 @@ wget https://docs.projectcalico.org/v3.19/manifests/calico.yaml --no-check-certi
 
 #### 2.5.10.3 应用文件
 
-
-
-~~~powershell
-kubectl apply -f calico.yaml
-~~~
-
-
+```
+# kubectl create -f custom-resources.yaml
+```
 
 
 
@@ -2528,14 +2550,18 @@ NAME          STATUS   ROLES    AGE   VERSION
 k8s-master1   Ready    <none>   55m   v1.21.10
 k8s-master2   Ready    <none>   53m   v1.21.10
 k8s-master3   Ready    <none>   53m   v1.21.10
-k8s-worker1   Ready    <none>   57m   v1.21.10
+k8s-node1   Ready    <none>   57m   v1.21.10
 ~~~
 
 
 
-### 2.5.10 部署CoreDNS
+### 2.5.11 部署CoreDNS
 
+#### 2.5.11.1 下载
 
+官网：https://github.com/coredns/deployment/blob/master/kubernetes/coredns.yaml.sed
+
+加速站：[kubernetes/coredns.yaml.sed · master · mirrors / coredns / deployment · GitCode](https://gitcode.net/mirrors/coredns/deployment/-/blob/master/kubernetes/coredns.yaml.sed)
 
 ~~~powershell
 cat >  coredns.yaml << "EOF"
@@ -2741,7 +2767,7 @@ spec:
 EOF
 ~~~
 
-
+#### 2.5.11.2 部署
 
 ~~~powershell
  kubectl apply -f coredns.yaml
@@ -2762,7 +2788,7 @@ kube-system   coredns-675db8b7cc-ncnf6                   1/1     Running   0    
 
 
 
-### 2.5.11 部署应用验证
+### 2.5.12 部署应用验证
 
 
 
@@ -2815,7 +2841,7 @@ kubectl apply -f nginx.yaml
 ~~~powershell
 # kubectl get pods -o wide
 NAME                     READY   STATUS    RESTARTS   AGE   IP              NODE          NOMINATED NODE   READINESS GATES
-nginx-web-qzvw4   1/1     Running   0          58s   10.244.194.65   k8s-worker1   <none>           <none>
+nginx-web-qzvw4   1/1     Running   0          58s   10.244.194.65   k8s-node1   <none>           <none>
 nginx-web-spw5t   1/1     Running   0          58s   10.244.224.1    k8s-master2   <none>           <none>
 ~~~
 
@@ -2841,14 +2867,14 @@ service/nginx-service-nodeport   NodePort    10.96.165.114   <none>        80:30
 ```
 在已有节点操作
 1.复制二进制文件
-scp kubelet kube-proxy k8s-worker2:/usr/local/bin
+scp kubelet kube-proxy k8s-node2:/usr/local/bin
 2.复制安装containerd
-scp -r etc opt/ usr/ k8s-worker2:/
-scp runc.amd64 k8s-worker2:/usr/local/sbin/runc
+scp -r etc opt/ usr/ k8s-node2:/
+scp runc.amd64 k8s-node2:/usr/local/sbin/runc
 2.复制安装kubelet kube-proxy相关文件
-scp kubelet-bootstrap.kubeconfig kubelet.json kube-proxy.yaml kube-proxy.kubeconfig  root@k8s-worker2:/etc/kubernetes/
-scp ca.pem root@k8s-worker2:/etc/kubernetes/ssl/
-scp kubelet.service  kube-proxy.service root@k8s-worker2:/usr/lib/systemd/system/
+scp kubelet-bootstrap.kubeconfig kubelet.json kube-proxy.yaml kube-proxy.kubeconfig  root@k8s-node2:/etc/kubernetes/
+scp ca.pem root@k8s-node2:/etc/kubernetes/ssl/
+scp kubelet.service  kube-proxy.service root@k8s-node2:/usr/lib/systemd/system/
 
 在node上操作
 cat >/etc/containerd/config.toml<<EOF
@@ -2922,9 +2948,9 @@ oom_score = -999
           endpoint = [
             "https://quay.mirrors.ustc.edu.cn"
           ]
-        [plugins.cri.registry.mirrors."harbor.kubemsb.com"]
+        [plugins.cri.registry.mirrors."harbor.eastportk8s.com"]
           endpoint = [
-            "http://harbor.kubemsb.com"
+            "http://harbor.eastportk8s.com"
           ]
     [plugins.cri.x509_key_pair_streaming]
       tls_cert_file = ""

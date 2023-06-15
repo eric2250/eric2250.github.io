@@ -34,7 +34,7 @@ Taints:             <none>
 		[root@k8s-master ~]# kubectl scale deployment web --replicas=3
 		[root@k8s-master ~]# kubectl get pods  -owide
 		[root@k8s-master ~]# kubectl delete deployment web
-
+	
 		```
 删除
 ```
@@ -536,7 +536,7 @@ tag: 1.15
 label: nginx
 port: 80
 nodeport: 30088
-``` 
+```
 定义变量
 ```
 cat mychart/templates/deployment.yaml 
@@ -719,9 +719,22 @@ kubectl exec -it nginx-pod
 kubectl describe deploy nginx  --all-namespaces
 ```
 
+强制删除pod、ns
 
+```
+kubectl delete pod POD_NAME --grace-period=0 --force
+```
 
+--grace-period=0：表示pod从删除操作开始到被终止的时间。设置为0表示立即终止，不会等待。
 
+--force：表示强制删除。如果pod无法正常删除时，使用此选项将pod从节点上强制删除。
+
+强制删除pv、pvc
+
+```
+kubectl patch pv xxx -p '{"metadata":{"finalizers":null}}'
+kubectl patch pvc xxx -p '{"metadata":{"finalizers":null}}'
+```
 
 
 
@@ -746,7 +759,6 @@ Rewrite 4e508cb00056d702957259e700749a6fa7c1eee2 (21/22) (16 seconds passed, rem
 Ref 'refs/heads/master' was rewritten
 
 ```
-
 
 
 
