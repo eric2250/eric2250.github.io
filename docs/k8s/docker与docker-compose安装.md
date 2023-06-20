@@ -17,9 +17,10 @@ yum -y install docker-ce
 systemctl enable docker && systemctl start docker &&systemctl status docker
 docker --version
 
-sudo tee /etc/docker/daemon.json <<-'EOF'
+cat > /etc/docker/daemon.json << EOF
 {
-  "registry-mirrors": ["https://kzjowymh.mirror.aliyuncs.com"]
+    "registry-mirrors": ["https://kzjowymh.mirror.aliyuncs.com"],
+    "exec-opts": ["native.cgroupdriver=systemd"]
 }
 EOF
 sudo systemctl daemon-reload
