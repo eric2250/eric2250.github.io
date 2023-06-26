@@ -13,7 +13,8 @@ sudo apt-get install -y docker-ce docker-ce-cli containerd.io
 ```Bash
 #下载安装源
 wget https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo -O /etc/yum.repos.d/docker-ce.repo
-yum -y install docker-ce
+yum list docker-ce --showduplicates | sort -r
+yum -y install docker-ce-20.10.0-3.el7
 systemctl enable docker && systemctl start docker &&systemctl status docker
 docker --version
 
