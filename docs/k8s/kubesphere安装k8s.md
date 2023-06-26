@@ -36,8 +36,16 @@ kubectl logs -n kubesphere-system $(kubectl get pod -n kubesphere-system -l 'app
 
 # 3 集群配置
 ### 生成配置文件修改以下内容
+
 ```
-./kk create config --with-kubesphere v3.3.0 --with-kubernetes v1.22.10
+./kk create config [--with-kubernetes version] [--with-kubesphere version] [(-f | --file) path]
+
+```
+
+
+
+```
+./kk create config --with-kubesphere v3.3.0 --with-kubernetes v1.24.10 -f config
 ```
 ```
 spec:

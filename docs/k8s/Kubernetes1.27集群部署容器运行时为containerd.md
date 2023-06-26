@@ -388,6 +388,14 @@ EOF
 # containerd config default > /etc/containerd/config.toml
 ~~~
 
+```
+sed -i 's#SystemdCgroup = false#SystemdCgroup = true#g' /etc/containerd/config.toml
+sed -i "s#registry.k8s.io/pause#registry.aliyuncs.com/google_containers/pause#g" /etc/containerd/config.toml
+# 查看编辑情况
+grep SystemdCgroup /etc/containerd/config.toml
+grep sandbox_image /etc/containerd/config.toml
+```
+
 
 
 ~~~powershell
@@ -611,6 +619,8 @@ KUBELET_EXTRA_ARGS="--cgroup-driver=systemd"
 提取码：gzrr
 crictl images 查不到镜像原因：ctr是containerd自带的工具，有命名空间的概念，若是k8s相关的镜像，都默认在k8s.io这个命名空间，所以导入镜像时需要指定命令空间为k8s.io
 ~~~powershell
+#导出
+ctr -n k8s.io i export  node.tar docker.io/calico/node:v3.26.0
 #导入
 ctr -n k8s.io images import coredns-v1.10.1.tar.gz 
 ctr -n k8s.io images import kube-apiserver-v1.27.2.tar.gz 

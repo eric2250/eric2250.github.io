@@ -6,6 +6,18 @@
 docker run --privileged -d --restart=unless-stopped -p 80:80 -p 443:443 rancher/rancher:v2.5.2-linux-amd64
 ```
 
+```
+mkdir -p /data/rancher_data
+docker run --privileged \
+--restart=always \
+-v /data/rancher_data:/var/lib/rancher \
+-p 80:80 \
+-p 443:443 \
+-d rancher/rancher:v2.6.7
+```
+
+
+
 ## 2.访问配置
 
 访问：https://172.100.3.112/
@@ -116,3 +128,10 @@ contexts:
 current-context: "erick8s"
 ```
 
+## 5.添加集群
+
+![image-20230625152726209](../images/k8s/image-20230625152726209.png)
+
+![image-20230625152829057](../images/k8s/image-20230625152829057.png)
+
+![image-20230625153040720](../images/k8s/image-20230625153040720.png)
