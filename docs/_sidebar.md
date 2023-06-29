@@ -31,6 +31,7 @@
   * [NodeJs环境搭建](/devops/Tools/NodeJs环境搭建.md)
   * [Calibre文档转换工具安装](/devops/Calibre文档转换工具安装.md)
 * Kubernetes学习
+  * [containerd的操作](/k8s/containerd的操作.md)
   * [docker与docker-compose安装](/k8s/docker与docker-compose安装.md)
   * [docker镜像操作](/k8s/docker镜像操作.md)
   * [Kubernetes学习记录](/k8s/README.md)
