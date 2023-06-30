@@ -24,6 +24,14 @@ cat > /etc/docker/daemon.json << EOF
     "exec-opts": ["native.cgroupdriver=systemd"]
 }
 EOF
+
+vim /etc/docker/daemon.json
+{
+        "insecure-registries": ["https://harbor.eric.com"],
+        "registry-mirrors": ["https://kzjowymh.mirror.aliyuncs.com"],
+        "exec-opts": ["native.cgroupdriver=systemd"]
+}
+
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 #用户使用docker
