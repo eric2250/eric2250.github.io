@@ -5,6 +5,7 @@
     * [菜单](/README.md)
 
 * DevOps学习
+  * [devop学习记录(k8s)](/devops/devop学习记录(k8s).md)
   * [ZenTao禅道安装](/devops/ZenTao禅道安装.md)
   * [confluence服务部署](/devops/confluence服务部署.md)
   * [mindoc安装](/devops/MinDoc安装.md)
