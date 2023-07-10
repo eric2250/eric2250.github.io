@@ -93,3 +93,60 @@ INFO[0004] Pushing image to registry.cn-hangzhou.aliyuncs.com/erictor888/myappwe
 INFO[0005] Pushed registry.cn-hangzhou.aliyuncs.com/erictor888/myappweb@sha256:978d699274b9c097b4c840cd322f70a1bd8b3a99c269c6e1dc84f3b40e16fc80 
 ```
 
+# 5.本地配置
+
+```
+kubectl delete  secret kaniko-secret
+kubectl create secret generic kaniko-secret --from-file=/root/.docker/config.json
+kubectl delete  secret dockerhub
+kubectl create secret docker-registry dockerhub --docker-server=http://172.100.3.111:888 --docker-username=admin --docker-password=Harbor12345
+```
+
+
+
+```
+cat 2kaniko.yaml 
+apiVersion: v1
+kind: Pod
+metadata:
+  name: kaniko
+spec:
+  containers:
+  - name: kaniko
+    image: registry.cn-hangzhou.aliyuncs.com/erictor888/kaniko-executor:v1.9.0
+    volumeMounts:
+      - name: kaniko-secret
+        mountPath: /kaniko/.docker/
+      - name: dockerfile-storage
+        mountPath: /workspace   
+    args:
+    - "--context=dir://workspace"
+    - "--destination=172.100.3.111:888/eric/myappweb:v1"
+    - "--dockerfile=Dockerfile"
+    - "--insecure=true"
+    - "--skip-tls-verify=true"
+  restartPolicy: Never
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: kaniko-secret     
+    - name: dockerfile-storage
+      nfs:
+        path: /data/nfs/kaniko/Dockerfiles
+```
+
+```
+kubectl delete -f kaniko.yaml 
+kubectl apply -f kaniko.yaml 
+kubectl logs kaniko --follow
+```
+
+```
+kubectl create secret docker-registry dockercred -n devops \
+    --docker-server=http://172.100.3.111:888 \
+    --docker-username=admin \
+    --docker-password=Abc,123.\
+    --docker-email=gouwqiang@163.com
+```
+
+https://gitee.com/erictor_admin/kaniko.git

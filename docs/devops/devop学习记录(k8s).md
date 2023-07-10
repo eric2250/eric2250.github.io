@@ -133,6 +133,10 @@ kubectl apply  -f jenkinsslave.yml
 - Docker 镜像:jenkins/inbound-agent:4.11-1-jdk11
 - 命令：空
 - 命令参数：空     ${computer.jnlpmac} ${computer.name}（ 查看镜像参数 docker inspect 52b4d160ebcf|grep "Cmd"）
+容器3
+- 名称:k8s
+- Docker 镜像:registry.cn-hangzhou.aliyuncs.com/erictor888/alpine-kubectl:v1(自定义镜像)（执行kubectl）
+- 其他默认
 - 
 卷（为了容器里能正常启动docker）
 
