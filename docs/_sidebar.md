@@ -52,6 +52,7 @@
   * [kubeadm安装的k8s集群卸载方式](/k8s/kubeadm安装的k8s集群卸载方式.md)
   * [harbor搭建](/k8s/harbor搭建.md)
   * [kaniko部署使用](/k8s/kaniko部署使用.md)
+  * [coredns添加私有dns服务](/k8s/coredns添加私有dns服务.md)
 * Linux系统学习
   * [Dns服务搭建](/Linux/搭建dns服务器.md)
   * [Nginx服务搭建](/Linux/nginx安装.md)
