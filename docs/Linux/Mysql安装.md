@@ -258,6 +258,13 @@ GRANT ALL PRIVILEGES ON . TO 'root'@'%' IDENTIFIED BY 'gwqgwq' WITH GRANT OPTION
 
 退出
 exit;
+8.x
+#新建用户
+CREATE USER 'root'@'%' IDENTIFIED BY 'password';
+#root用户
+update user set host='%' where user='root';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+FLUSH PRIVILEGES;
 ```
 
 # 3.docker安装mysql
