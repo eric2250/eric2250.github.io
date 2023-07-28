@@ -243,19 +243,14 @@ use mysql
 
 查询
 select host,user from user;
-
 更改成可以在所有的主机登录
 update user set host='%' where user='root';
-
 更改成加密密码（需要刷新权限，允许远程用户连接）
 ALTER USER 'root'@'%' IDENTIFIED WITH mysql_native_password BY 'gwqgwq';
-
 刷新权限
 flush privileges;
-
 允许远程用户连接（5.x）
-GRANT ALL PRIVILEGES ON . TO 'root'@'%' IDENTIFIED BY 'gwqgwq' WITH GRANT OPTION;
-
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' IDENTIFIED BY 'gwqgwq' WITH GRANT OPTION;
 退出
 exit;
 8.x
