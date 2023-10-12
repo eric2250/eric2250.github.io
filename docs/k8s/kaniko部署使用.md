@@ -1,9 +1,10 @@
 # 1. 新建一个Dockerfile
 
 ```
-[root@ha1 kaniko]# cat Dockerfile 
+cat > /apps/kaniko/demo/Dockerfile << EOF
 FROM alpine
 ENTRYPOINT ["/bin/sh", "-c", "echo hello"]
+EOF
 ```
 
 
@@ -61,11 +62,11 @@ spec:
             path: config.json
     - name: dockerfile-storage
       hostPath:
-        path: /storage/dev/soft/kaniko/demo
+        path: /apps/kaniko/demo
         type: DirectoryOrCreate
     - name: kaniko-cache
       hostPath:
-        path: /storage/dev/soft/kaniko/cache
+        path: /apps/kaniko/cache
         type: DirectoryOrCreate
 ```
 
