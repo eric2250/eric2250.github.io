@@ -32,10 +32,11 @@
   * [NodeJs环境搭建](/devops/Tools/NodeJs环境搭建.md)
   * [Calibre文档转换工具安装](/devops/Calibre文档转换工具安装.md)
 * Kubernetes学习
+  * [Kubernetes学习记录](/k8s/README.md)
   * [containerd的操作](/k8s/containerd的操作.md)
   * [docker与docker-compose安装](/k8s/docker与docker-compose安装.md)
   * [docker镜像操作](/k8s/docker镜像操作.md)
-  * [Kubernetes学习记录](/k8s/README.md)
+  * [使用kubeadm搭建K8s1.28.2集群](/k8s/Kubernetes1.28集群部署容器运行时为docker.md)
   * [使用kubeadm快速部署一个K8s集群](k8s/fast-install-k8s.md)
   * [使用kubeadm搭建高可用的K8s集群](k8s/使用kubeadm搭建高可用的K8s集群)
   * [使用kubeadm搭建K8s1.27集群](k8s/Kubernetes1.27集群部署容器运行时为containerd.md)
