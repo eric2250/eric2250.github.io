@@ -8,11 +8,11 @@
 
 K8s有没有用
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/90998906d1f040cabfa8a92501ab73dc.png)
+![image.png](../../docs/images/k8s/90998906d1f040cabfa8a92501ab73dc.png)
 
 K8s要不要学？
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/9e6a06241dee46728bde9184d40c8a66.jpg)
+![image.png](../../docs/images/k8s/9e6a06241dee46728bde9184d40c8a66.jpg)
 
 ```pow
 参考资料:
@@ -21,23 +21,23 @@ https://www.infoq.com/articles/devops-and-cloud-trends-2022/?itm_source=articles
 
 ### 1.2 K8s 是什么？
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/523c14c863204efcb757f2695ee49fe6.png)
+![image.png](../../docs/images/k8s/523c14c863204efcb757f2695ee49fe6.png)
 
 ### 1.3 k8s 部署方式
 
 目前Kubernetes的两类部署样式
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/970170ede5cf4fcd908b19fdb579711e.png)
+![image.png](../../docs/images/k8s/970170ede5cf4fcd908b19fdb579711e.png)
 
 ### 1.4 k8s 环境解析
 
 网络环境解析
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/f1b76d12294e4b6f83227004c054b601.png)
+![image.png](../../docs/images/k8s/f1b76d12294e4b6f83227004c054b601.png)
 
 部署结构解析
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/83eaf14444d1474e966bf3dd49eceec6.png)
+![image.png](../../docs/images/k8s/83eaf14444d1474e966bf3dd49eceec6.png)
 
 ## 2 环境部署
 
@@ -512,13 +512,13 @@ kubectl get node
 
 ### 3.1 应用管理解读
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/176c040ad69e4c6c84763b0058c62740.png)
+![image.png](../../docs/images/k8s/176c040ad69e4c6c84763b0058c62740.png)
 
 ### 3.2 应用部署实践
 
 资源对象管理关系
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/4d41b8459755492e95944390172cd6fc.png)
+![image.png](../../docs/images/k8s/4d41b8459755492e95944390172cd6fc.png)
 
 资源对象管理实践
 
@@ -662,7 +662,7 @@ kubectl set image deployment 资源对象名称 容器名称=镜像名称
 
 ### 4.1 service对象定位
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/0f12d9679f354e59bfe5f33dfadce8e9.png)
+![image.png](../../docs/images/k8s/0f12d9679f354e59bfe5f33dfadce8e9.png)
 
 ### 4.2 Service 实践
 
@@ -830,15 +830,15 @@ spec:
 
 k8s应用数据类型和步骤解析
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/3eb86f24f6224c6b918605c3a12db22f.png)
+![image.png](../../docs/images/k8s/3eb86f24f6224c6b918605c3a12db22f.png)
 
 k8s如何使用数据功能
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/07c9ecff65fe4a939a401ab178671974.png)
+![image.png](../../docs/images/k8s/07c9ecff65fe4a939a401ab178671974.png)
 
 k8s使用各种数据类型的配置
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/b8196355709a402aa3522ea3db5840da.png)
+![image.png](../../docs/images/k8s/b8196355709a402aa3522ea3db5840da.png)
 
 ### 5.2 应用数据实践
 
@@ -896,7 +896,7 @@ spec:
 
 k8s如何使用配置数据功能
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/7132b215a8974a0db11bd3b689a9bee6.png)
+![image.png](../../docs/images/k8s/7132b215a8974a0db11bd3b689a9bee6.png)
 
 ### 6.2 配置文件实践
 
@@ -1059,7 +1059,7 @@ Ingress是授权入站连接到达集群服务的规则集合。
     根据虚拟主机名直接调度到后端的一组应用pod中
 ```
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/f88dcb5bf765417ca8675796f14cef7b.png)
+![image.png](../../docs/images/k8s/f88dcb5bf765417ca8675796f14cef7b.png)
 
 ### 7.2 Ingress部署
 
@@ -1205,7 +1205,7 @@ helm的功能类似于yum 或 apt，提供应用部署时候所需要的各种�
         helm管理的主要是：资源定义文件和专用文件。
 ```
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/634d4622159f447e9e3612a44f266b14.png)
+![image.png](../../docs/images/k8s/634d4622159f447e9e3612a44f266b14.png)
 
 ```powershell
 基于helm来成功的部署一个应用服务，完整的工作流程如下：
@@ -1223,7 +1223,7 @@ v3介绍
 根据我们对 helm v2 版本的流程解析，我们发现，在客户端上部署tiller来维护 release相关的信息，有些太重量级了，所以在 helm v3 版本的时候，就剔除了专门的Tiller。在 Helm v3 中移除了 Tiller, 版本相关的数据直接存储在了 Kubernetes 中.
 ```
 
-![image.png](https://fynotefile.oss-cn-zhangjiakou.aliyuncs.com/fynote/fyfile/11403/1689328373092/6efef8c8d5c64c7a853fd41507e67a9e.png)
+![image.png](../../docs/images/k8s/6efef8c8d5c64c7a853fd41507e67a9e.png)
 
 ### 8.2 helm部署
 
