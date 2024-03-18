@@ -71,5 +71,6 @@
   * [Centos&Ubuntu防火墙设置](/Linux/Centos&Ubuntu防火墙设置.md)
 * Dm达梦数据库学习
   * [达梦数据库安装配置](/dm/达梦数据库安装配置.md)
+  * [达梦数据库使用记录](/dm/达梦数据库使用记录.md)
 * 东方通软件学习
   * [安装TongLINK/Q](/tong/安装TongLink_Q.md)
