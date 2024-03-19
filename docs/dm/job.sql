@@ -1,0 +1,16 @@
+call SP_CREATE_JOB('job2',1,0,'',0,0,'',0,'');
+
+call SP_JOB_CONFIG_START('job2');
+
+call SP_ADD_JOB_STEP('job2', 'step1', 0, 'SELECT * FROM SYSJOB.SYSJOBS;', 0, 0, 0, 0, NULL, 0);
+
+call SP_ADD_JOB_SCHEDULE('job2', 'step2', 1, 2, 1, 62, 0, '13:00:05', NULL, '2024-03-19 14:50:05', NULL, '');
+
+call SP_JOB_CONFIG_COMMIT('job2');
+
+--查看job
+SELECT * FROM SYSJOB.SYSJOBS;
+--查看步骤
+SELECT * FROM SYSJOB.SYSJOBSCHEDULES;
+--查看结果
+SELECT * FROM SYSJOB.SYSJOBHISTORIES;
