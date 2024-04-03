@@ -62,6 +62,13 @@ cd /apps/rabbitmq/rabbitmq_server-3.13.0/sbin
 
   Starting broker... completed with 0 plugins.
 ....
+
+后台启动
+rabbitmq-server -detached
+
+rabbitmqctl status
+
+rabbitmqctl stop
 ```
 
 ### 启动
