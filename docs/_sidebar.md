@@ -77,4 +77,4 @@
 * 东方通软件学习
   * [安装TongLINK/Q](/tong/安装TongLink_Q.md)
 * 中间件学习
-  * [RabbitMq安装与使用](/tong/RabbitMq安装与使用.md)
+  * [RabbitMq安装与使用](/rabbitmq/RabbitMq安装与使用.md)
