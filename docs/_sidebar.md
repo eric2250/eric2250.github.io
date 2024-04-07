@@ -69,6 +69,7 @@
   * [Ubuntu22.04安装后配置](/Linux/Ubuntu22.04安装后配置.md)
   * [Jdk下载安装与环境变量配置](/Linux/Jdk下载安装与环境变量配置.md)
   * [Centos&Ubuntu防火墙设置](/Linux/Centos&Ubuntu防火墙设置.md)
+  * [CentOS7安装配置samba服务](/Linux/CentOS7安装配置samba服务.md)
 * Dm达梦数据库学习
   * [达梦数据库安装配置](/dm/达梦数据库安装配置.md)
   * [数据守护集群安装部署](/dm/数据守护集群安装部署.md)
