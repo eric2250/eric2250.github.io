@@ -559,5 +559,5 @@ cd /data/tlq/TLQ8.1_ManageConsole/bin
 
 登录成功如下截图：
 
-![image-20240328163737170](D:\code\docs\eric2250.github.io\docs\images\tong\image-20240328163737170.png)
+![image-20240328163737170](../images/tong/image-20240328163737170.png)
 
