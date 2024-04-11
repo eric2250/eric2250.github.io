@@ -860,7 +860,7 @@ public class Producer {
 
 ```
 
-C1：
+#### C1：
 
 ```
 package com.eric.rabbitmq.deadqueue;
@@ -932,7 +932,7 @@ public class Consumer01 {
 
 ```
 
-C2：
+### C2：
 
 ```
 package com.eric.rabbitmq.deadqueue;
