@@ -21,7 +21,10 @@ tlqstat -rcv qcu1 1
 tlqstat -lic
 #开启监控代理对应配置文件tlsys.conf。
 tlqremote
-
+停止
+tlqremote -cstop
+查看ipc资源
+tlqipc
 ```
 
 
