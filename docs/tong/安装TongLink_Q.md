@@ -55,7 +55,35 @@ vim setp
 cat setp >> ~/.bash_profile
 source /apps/tlq/TLQ8
 ```
+### 配置系统资源
+```
+vim /etc/sysctl.conf 
+kernel.sem =5120 32000 5120 5120
+生效
+sysctl -p /etc/sysctl.conf
 
+ vim /etc/security/limits.conf
+tlq      hard     nofile         65535
+tlq      soft     nofile         65535
+[root@ep-db-01 bin]# ulimit -a
+core file size          (blocks, -c) 0
+data seg size           (kbytes, -d) unlimited
+scheduling priority             (-e) 0
+file size               (blocks, -f) unlimited
+pending signals                 (-i) 55380
+max locked memory       (kbytes, -l) 64
+max memory size         (kbytes, -m) unlimited
+open files                      (-n) 65535
+pipe size            (512 bytes, -p) 8
+POSIX message queues     (bytes, -q) 819200
+real-time priority              (-r) 0
+stack size              (kbytes, -s) 8192
+cpu time               (seconds, -t) unlimited
+max user processes              (-u) 55380
+virtual memory          (kbytes, -v) unlimited
+file locks  
+
+```
 ### 测试可用性
 
 ```
