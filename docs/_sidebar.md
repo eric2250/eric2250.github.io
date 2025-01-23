@@ -57,6 +57,7 @@
   * [pv和pvc和sc](/k8s/pv和pvc和sc.md)
 * Linux系统学习
   * [Dns服务搭建](/Linux/搭建dns服务器.md)
+  * [Nas黑群晖服务搭建](/nas/手把手搭建黑群晖.md)
   * [Nginx服务搭建](/Linux/nginx安装.md)
   * [Mysql安装](/Linux/Mysql安装.md)  
   * [NFS搭建](/Linux/centos-nfs搭建.md)
