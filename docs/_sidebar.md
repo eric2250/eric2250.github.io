@@ -3,7 +3,8 @@
 * [首页](/)
   * [开始使用 Let Go](/README.md) <!--注意这里是相对路径-->
     * [菜单](/README.md)
-
+* 大模型学习
+  * [Deepseek安装配置](/ai/Deepseek搭建.md)
 * DevOps学习
   * [devop学习记录(k8s)](/devops/devop学习记录(k8s).md)
   * [ZenTao禅道安装](/devops/ZenTao禅道安装.md)

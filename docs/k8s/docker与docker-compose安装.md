@@ -43,6 +43,14 @@ su jenkins -
 newgrp - docker
 ```
 
+## 1.3中标麒麟
+
+```
+yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+```
+
+
+
 # 2. 安装 docker compose 命令：
 
 https://github.com/docker/compose/releases
