@@ -5,6 +5,7 @@
     * [菜单](/README.md)
 * 大模型学习
   * [Deepseek安装配置](/ai/Deepseek搭建.md)
+  * [Deepseek+ragflow安装配置](/ai/DeepSeek-R1+RAGFlow.md)
 * DevOps学习
   * [devop学习记录(k8s)](/devops/devop学习记录(k8s).md)
   * [ZenTao禅道安装](/devops/ZenTao禅道安装.md)
