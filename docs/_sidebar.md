@@ -5,6 +5,8 @@
     * [菜单](/README.md)
 * 大模型学习
   * [Deepseek安装配置](/ai/Deepseek搭建.md)
+  * [Panel安装配置](/ai/DPanel.md)
+  * [Deepseek+ragflow+Dfiy+MaxKb安装配置](/ai/各个知识库安装.md)
   * [Deepseek+ragflow安装配置](/ai/DeepSeek-R1+RAGFlow.md)
 * DevOps学习
   * [devop学习记录(k8s)](/devops/devop学习记录(k8s).md)
