@@ -46,7 +46,68 @@ newgrp - docker
 ## 1.3中标麒麟
 
 ```
-yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo yum install -y yum-utils device-mapper-persistent-data lvm2
+
+# 官方仓库地址（可能需要网络访问权限）
+wget -O /etc/yum.repos.d/docker-ce.repo https://download.docker.com/linux/centos/docker-ce.repo
+
+# 若网络受限，可替换为国内镜像源，如阿里云仓库
+wget -O /etc/yum.repos.d/docker-ce.repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+sudo sed -i 's/$releasever/7/g' /etc/yum.repos.d/docker-ce.repo
+sudo yum clean all && sudo yum makecache
+
+sudo yum install -y docker-ce docker-ce-cli containerd.io
+sudo systemctl start docker
+sudo systemctl enable docker
+docker --version
+
+
+
+```
+
+离线安装：
+
+```
+#下载解压
+wget --no-check-certificate https://download.docker.com/linux/static/stable/x86_64/docker-26.0.0.tgz 
+tar zxvf docker-26.0.0.tgz 
+mv docker/* /usr/bin/
+cat > /usr/lib/systemd/system/docker.service << EOF
+[Unit]
+Description=Docker Application Container Engine
+Documentation=https://docs.docker.com
+After=network-online.target firewalld.service
+Wants=network-online.target
+
+[Service]
+Type=notify
+ExecStart=/usr/bin/dockerd
+ExecReload=/bin/kill -s HUP $MAINPID
+LimitNOFILE=infinity
+LimitNPROC=infinity
+TimeoutStartSec=0
+Delegate=yes
+KillMode=process
+Restart=on-failure
+StartLimitBurst=3
+StartLimitInterval=60s
+
+[Install]
+WantedBy=multi-user.target
+EOF
+systemctl daemon-reload
+systemctl start docker
+systemctl status docker
+docker -v
+mkdir -p /etc/docker/
+cat > /etc/docker/daemon.json << EOF
+{
+    "registry-mirrors": ["https://kzjowymh.mirror.aliyuncs.com"],
+    "exec-opts": ["native.cgroupdriver=systemd"]
+}
+EOF
+systemctl restart docker
+
 ```
 
 

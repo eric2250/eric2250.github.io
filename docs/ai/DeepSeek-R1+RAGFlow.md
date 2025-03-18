@@ -134,8 +134,6 @@ curl -s -L https://nvidia.github.io/nvidia-docker/$distribution/nvidia-docker.re
 
 
 
-![image-20250309111209022](/images/image-20250309111209022.png)
-
 windows下安装:
 
 
@@ -150,8 +148,6 @@ OLLAMA_MODELS D:\Ollama\models
 ```
 
 安装deekseek模型:
-
-![image-20250309210030138](/images/image-20250309210030138.png)
 
 [deepseek-r1](https://ollama.com/library/deepseek-r1)
 
@@ -189,37 +185,37 @@ chmod +x /usr/local/bin/docker-compose
 
 ### 访问配置绑定自己模型：
 
-随便注册一个账号登录成功，创建一个知识库。
+随便注册一个账号登录成功，点击进入点击头像，点击模型提供商，点击Ollama添加deepseek模型
 
-![image-20250309164815523](/images/image-20250309164815523.png)
+![image-20250317140231695](D:\code\docs\eric2250.github.io\docs\images\ai\image-20250317140231695.png)
 
-点击进入知识库，点击Ollama添加deepseek模型
+填写信息：
 
-![image-20250309165046024](/images/image-20250309165046024.png)
+```
+deepseek-r1:1.5b
 
-填写信息
+http://172.100.3.106:11434
+```
 
-![image-20250309170100892](/images/image-20250309170100892.png)
+![image-20250317140904790](D:\code\docs\eric2250.github.io\docs\images\ai\image-20250317140904790.png)
 
 选择部署的模型
 
-![image-20250309170218894](/images/image-20250309170218894.png)
+
 
 进入知识库配置
 
-![image-20250309170455636](/images/image-20250309170455636.png)
+
 
 上传知识库文件，点击解析。
 
-![image-20250309171930922](/images/image-20250309171930922.png)
+
 
 配置聊天助手，点击-聊天-新建助手-填写名称-选择知识库
 
-![image-20250309171336905](/images/image-20250309171336905.png)
+
 
 新建聊天，输入问题开始聊天
-
-![image-20250309172203535](/images/image-20250309172203535.png)
 
 
 
@@ -227,18 +223,7 @@ chmod +x /usr/local/bin/docker-compose
 
 点击头像-选择模型
 
-![image-20250309172903536](/images/image-20250309172903536.png)
-
 填写apikey
-
-
-
-![image-20250309172752500](/images/image-20250309172752500.png)
 
 修改模型选择
 
-![image-20250309173153946](/images/image-20250309173153946.png)
-
-![image-20250309173229796](/images/image-20250309173229796.png)
-
-![image-20250309173540114](/images/image-20250309173540114.png)
