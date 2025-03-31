@@ -197,3 +197,20 @@ systemctl start docker
 docker info |grep "Root Dir"
  Docker Root Dir: /apps/docker
 ```
+
+# 5.开启2375远程连接
+```
+~]# cat /etc/docker/daemon.json 
+{
+    "registry-mirrors":[
+    "https://kzjowymh.mirror.aliyuncs.com",
+    "https://docker.1ms.run",
+    "https://proxy.1panel.live",
+    "https://docker.ketches.cn"
+    ],
+    "hosts": ["unix:///var/run/docker.sock", "tcp://0.0.0.0:2375"]
+   
+}
+
+systemctl daemon-reload && systemctl restart docker
+```
