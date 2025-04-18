@@ -8,6 +8,7 @@
   * [Panel安装配置](/ai/DPanel.md)
   * [Deepseek+ragflow+Dfiy+MaxKb安装配置](/ai/各个知识库安装.md)
   * [Deepseek+ragflow安装配置](/ai/DeepSeek-R1+RAGFlow.md)
+  * [Deepseek+Idea集成](/ai/Idea与大模型集成.md)
 * DevOps学习
   * [devop学习记录(k8s)](/devops/devop学习记录(k8s).md)
   * [ZenTao禅道安装](/devops/ZenTao禅道安装.md)
