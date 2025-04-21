@@ -38,4 +38,8 @@
 
 ![image-20250418104726897](../images/ai/image-20250418104726897.png)
 
+## 5.使用灵码
 
+[Lingma - Alibaba Cloud AI Coding Assistant Plugin for JetBrains IDEs | JetBrains Marketplace](https://plugins.jetbrains.com/plugin/17809-lingma--alibaba-cloud-ai-coding-assistant/versions/stable)
+
+![image-20250418142940685](D:\code\docs\eric2250.github.io\docs\images\ai\image-20250418142940685.png)
